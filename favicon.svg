@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <!-- Fondo redondeado en tonos Verde Esmeralda y Gris Tecnológico -->
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#064e3b"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+        </linearGradient>
+    </defs>
+    <rect width="64" height="64" rx="14" fill="url(#bgGrad)" stroke="#10b981" stroke-width="3"/>
+
+    <!-- Líneas conectoras de nodos (Arquitectura de Datos) -->
+    <line x1="32" y1="32" x2="32" y2="14" stroke="#34d399" stroke-width="2.5"/>
+    <line x1="32" y1="32" x2="48" y2="24" stroke="#34d399" stroke-width="2.5"/>
+    <line x1="32" y1="32" x2="16" y2="24" stroke="#34d399" stroke-width="2.5"/>
+    <line x1="32" y1="32" x2="32" y2="52" stroke="#10b981" stroke-width="3"/>
+
+    <!-- Hojas laterales en la base del tallo -->
+    <path d="M32 46 C22 46 18 38 18 38 C26 38 30 42 32 46 Z" fill="#10b981"/>
+    <path d="M32 46 C42 46 46 38 46 38 C38 38 34 42 32 46 Z" fill="#10b981"/>
+
+    <!-- Nodos periféricos (Pétalos / Nodos de Memoria) -->
+    <circle cx="32" cy="14" r="6" fill="#10b981" stroke="#a7f3d0" stroke-width="2"/>
+    <circle cx="48" cy="24" r="5.5" fill="#059669" stroke="#a7f3d0" stroke-width="2"/>
+    <circle cx="16" cy="24" r="5.5" fill="#059669" stroke="#a7f3d0" stroke-width="2"/>
+
+    <!-- Nodo Central (Corazón de la flor / Nodo Raíz) -->
+    <circle cx="32" cy="30" r="7" fill="#ecfdf5" stroke="#10b981" stroke-width="3"/>
+    <circle cx="32" cy="30" r="2.5" fill="#065f46"/>
+</svg>

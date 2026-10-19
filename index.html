@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     PROYECTO UNIVERSITARIO: ARQUITECTURA DE DATOS - ASOCIACIÓN DE FLORICULTORES
+     Institución: Institución Universitaria Digital de Antioquia (IU Digital de Antioquia)
+     Equipo Consultor:
+       1. Jhon Fredy Betancur Davila
+       2. Cristian Gutierrez
+       3. Jose Fernando Higuita
+       4. Arnold Diaz
+     Tipo de Aplicación: Single Page Application (SPA) - Dashboard Interactivo
+     Tecnologías: HTML5 Semántico, Tailwind CSS (CDN), Vanilla JavaScript (ES6+)
+     Propósito Académico: Material de estudio exhaustivamente comentado sobre
+     estructuras de datos estáticas (Vectores 1D, Matrices 2D) y dinámicas
+     (Listas Enlazadas Simples), aplicadas al sector floricultor.
+     ========================================================================== -->
+<html lang="es" class="scroll-smooth">
+<head>
+    <!-- Codificación de caracteres UTF-8 para soportar tildes y caracteres especiales en español -->
+    <meta charset="UTF-8">
+    <!-- Configuración del viewport para garantizar diseño completamente Responsive (móviles, tablets y escritorio) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título de la pestaña del navegador -->
+    <title>Dashboard de Arquitectura de Datos - IU Digital de Antioquia</title>
+    <!-- Favicon vectorial personalizado acorde a la temática (Floricultura + Nodos de Datos) -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Importación de Tailwind CSS vía CDN oficial para estilizado moderno tipo Dashboard -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind CSS para definir paleta de colores (Verdes Naturaleza + Grises Tecnológicos) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Tonos verdes naturaleza inspirados en cultivo e invernaderos
+                        flora: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Estilos CSS adicionales para animaciones suaves de nodos y controles numéricos compactos -->
+    <style>
+        /* Animación de entrada para cuando se renderizan tarjetas o nodos dinámicos en el DOM */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .animate-node {
+            animation: fadeInScale 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Ocultamos las flechas nativas de los inputs numéricos en la matriz para aprovechar el 100% del ancho sin recortes */
+        input[type="number"].celda-matriz::-webkit-inner-spin-button,
+        input[type="number"].celda-matriz::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"].celda-matriz {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 font-sans antialiased selection:bg-emerald-600 selection:text-white min-h-screen flex flex-col">
+
+    <!-- ==========================================================================
+         BARRA DE NAVEGACIÓN SUPERIOR (STICKY NAVBAR)
+         Identidad de la IU Digital de Antioquia y accesos rápidos a las 4 secciones
+         ========================================================================== -->
+    <nav class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-emerald-500/30 text-slate-100 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+                <!-- Identidad institucional: IU Digital de Antioquia -->
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center justify-center px-2.5 h-9 rounded-lg bg-emerald-600 text-white font-extrabold text-xs tracking-wider shadow-inner">
+                        IUD
+                    </span>
+                    <div>
+                        <span class="text-[11px] uppercase tracking-widest text-emerald-400 font-bold block">
+                            IU Digital de Antioquia
+                        </span>
+                        <span class="text-xs sm:text-sm font-bold text-white">
+                            Arquitectura de Datos — Asociación Floricultores
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Enlaces de navegación rápida a cada sección semántica -->
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium">
+                    <a href="#req-a" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                        Req. A: Vector (1D)
+                    </a>
+                    <a href="#req-b" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                        Req. B: Matriz (2D)
+                    </a>
+                    <a href="#req-c" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                        Req. C: Lista Dinámica
+                    </a>
+                    <a href="#autoevaluacion" class="px-2.5 py-1.5 rounded-md bg-emerald-700 text-white hover:bg-emerald-500 transition-colors">
+                        Autoevaluación (Equipo)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================================================================
+         ENCABEZADO PRINCIPAL (HERO SECTION)
+         Presenta el título oficial, la institución y los 4 integrantes del equipo
+         ========================================================================== -->
+    <header class="bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white border-b-4 border-emerald-500 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-12 space-y-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div class="max-w-3xl">
+                    <!-- Insignia institucional de la IU Digital de Antioquia -->
+                    <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-4">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>IU Digital de Antioquia • Evidencia de Aprendizaje 1 • Asignatura: Estructura de Datos</span>
+                    </div>
+
+                    <!-- Título grande exigido por el requerimiento -->
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                        Dashboard de Arquitectura de Datos - Asociación Floricultores
+                    </h1>
+
+                    <!-- Subtítulo explicativo sobre la propuesta de consultoría -->
+                    <p class="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
+                        Propuesta de consultoría tecnológica sobre <strong class="text-emerald-400 font-semibold">estructuras de datos estáticas y dinámicas</strong> para optimizar el almacenamiento en memoria, el monitoreo climático, el control de producción en invernaderos y la gestión de talento humano temporal.
+                    </p>
+                </div>
+
+                <!-- Tarjetas de resumen ejecutivo de arquitectura en el Hero -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 bg-slate-800/70 p-4 rounded-xl border border-slate-700 backdrop-blur-sm text-center shrink-0">
+                    <div class="px-2">
+                        <span class="block text-xs text-slate-400 uppercase">Requerimiento A</span>
+                        <span class="text-lg sm:text-xl font-bold text-emerald-400">Vector 1D</span>
+                        <span class="block text-[11px] text-slate-300">30 Días Fijos</span>
+                    </div>
+                    <div class="px-2 border-x border-slate-700">
+                        <span class="block text-xs text-slate-400 uppercase">Requerimiento B</span>
+                        <span class="text-lg sm:text-xl font-bold text-emerald-400">Matriz 4x5</span>
+                        <span class="block text-[11px] text-slate-300">20 Celdas Fijas</span>
+                    </div>
+                    <div class="px-2">
+                        <span class="block text-xs text-slate-400 uppercase">Requerimiento C</span>
+                        <span class="text-lg sm:text-xl font-bold text-emerald-400">Nodos -&gt;</span>
+                        <span class="block text-[11px] text-slate-300">Memoria Dinámica</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Créditos del Equipo Consultor (IU Digital de Antioquia) -->
+            <div class="bg-slate-900/80 border border-emerald-500/30 rounded-xl p-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                        Equipo Consultor — IU Digital de Antioquia
+                    </span>
+                    <span class="text-xs text-slate-300 font-mono">
+                        Evidencia de Aprendizaje 1 • Asignatura: Estructura de Datos
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Integrante 1 -->
+                    <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">JB</span>
+                        <div class="min-w-0">
+                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Jhon Fredy Betancur Davila</span>
+                            <span class="text-[11px] text-emerald-400 block">Arquitecto de Datos &amp; Memoria</span>
+                        </div>
+                    </div>
+                    <!-- Integrante 2 -->
+                    <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">CG</span>
+                        <div class="min-w-0">
+                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Cristian Gutierrez</span>
+                            <span class="text-[11px] text-emerald-400 block">Líder Frontend &amp; DOM</span>
+                        </div>
+                    </div>
+                    <!-- Integrante 3 -->
+                    <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">JH</span>
+                        <div class="min-w-0">
+                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Jose Fernando Higuita</span>
+                            <span class="text-[11px] text-emerald-400 block">Analista de Algoritmos</span>
+                        </div>
+                    </div>
+                    <!-- Integrante 4 -->
+                    <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">AD</span>
+                        <div class="min-w-0">
+                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Arnold Diaz</span>
+                            <span class="text-[11px] text-emerald-400 block">Diseñador UX/UI &amp; QA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         CONTENIDO PRINCIPAL DEL DASHBOARD (<main>)
+         Contiene las 4 secciones modulares requeridas
+         ========================================================================== -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 flex-grow w-full">
+
+        <!-- ======================================================================
+             SECCIÓN 1: REQUERIMIENTO A - TEMPERATURAS MENSUALES (30 DÍAS)
+             Estructura: Arreglo Unidimensional (Vector Estático)
+             ====================================================================== -->
+        <section id="req-a" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <!-- Encabezado de la Sección 1 -->
+            <div class="bg-slate-800 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-700">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-md bg-emerald-600 text-xs font-bold uppercase tracking-wider">Requerimiento A</span>
+                    <h2 class="text-xl font-bold">Temperaturas Mensuales (30 días)</h2>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 text-emerald-400 px-3 py-1 rounded border border-slate-700">
+                    Declaración lógica: float temperaturas[30];
+                </span>
+            </div>
+
+            <!-- Cuerpo de la Sección 1: Grid Responsivo (Interfaz a la izquierda, Ficha Técnica a la derecha) -->
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                <!-- Columna Izquierda (7 de 12 columnas en escritorio): Simulador Visual del Vector -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-5">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Simulador de Vector Contiguo en Memoria</h3>
+                                <p class="text-sm text-slate-600">
+                                    Cada casilla representa una posición contigua del índice <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono text-xs">[0]</code> al <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono text-xs">[29]</code> (30 días del mes).
+                                </p>
+                            </div>
+
+                            <!-- Grupo de Botones: "Generar 30 días de Temperatura" y "Limpiar Tablero" -->
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <button
+                                    id="btn-generar-temperaturas"
+                                    type="button"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                                >
+                                    <span>Generar 30 días de Temperatura</span>
+                                </button>
+
+                                <!-- Nuevo botón solicitado para limpiar el tablero del vector -->
+                                <button
+                                    id="btn-limpiar-temperaturas"
+                                    type="button"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-slate-200 hover:bg-rose-600 hover:text-white active:bg-rose-700 text-slate-700 font-semibold text-sm transition-all cursor-pointer"
+                                    title="Reiniciar las 30 posiciones del vector y limpiar el tablero"
+                                >
+                                    <span>Limpiar Tablero</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel de métricas resumidas del Vector (Promedio, Mínima, Máxima y Acceso O(1)) -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                <span class="text-xs text-slate-500 block">Tamaño Fijo (N)</span>
+                                <span class="text-lg font-bold text-slate-800 font-mono">30 elementos</span>
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                <span class="text-xs text-emerald-700 block">Promedio Mensual</span>
+                                <span id="temp-promedio" class="text-lg font-bold text-emerald-800 font-mono">-- °C</span>
+                            </div>
+                            <div class="bg-sky-50 p-3 rounded-lg border border-sky-200">
+                                <span class="text-xs text-sky-700 block">Mínima Registrada</span>
+                                <span id="temp-min" class="text-lg font-bold text-sky-800 font-mono">-- °C</span>
+                            </div>
+                            <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                                <span class="text-xs text-amber-700 block">Máxima Registrada</span>
+                                <span id="temp-max" class="text-lg font-bold text-amber-800 font-mono">-- °C</span>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor que simula visualmente un Vector de 30 posiciones -->
+                        <div class="bg-slate-900 p-4 rounded-xl border-2 border-slate-700 shadow-inner">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono mb-3 pb-2 border-b border-slate-800">
+                                <span>BLOQUE CONTIGUO DE MEMORIA RAM: Base 0x1000</span>
+                                <span id="estado-vector" class="text-amber-400">Esperando inicialización...</span>
+                            </div>
+
+                            <!-- Grid donde JavaScript inyectará dinámicamente las 30 tarjetas pequeñas -->
+                            <div
+                                id="contenedor-vector"
+                                class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2.5 min-h-[240px] items-center"
+                            >
+                                <!-- Mensaje inicial antes de presionar el botón -->
+                                <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+                                    Haz clic en <strong class="text-emerald-400">"Generar 30 días de Temperatura"</strong> para poblar los 30 índices estáticos del vector.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nota pedagógica de complejidad algorítmica -->
+                    <div class="bg-emerald-50/80 border-l-4 border-emerald-600 p-3.5 rounded-r-lg text-xs text-slate-700">
+                        <strong class="text-emerald-800">Nota de Ingeniería:</strong> En un vector estático, la dirección de memoria de cualquier día se calcula instantáneamente con la fórmula <code class="font-mono bg-white px-1 py-0.5 rounded border">Dirección(i) = Base + (i × Tamaño_Tipo)</code>, logrando complejidad temporal <strong>O(1)</strong>.
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (5 de 12 columnas en escritorio): Ficha Técnica Visible -->
+                <aside class="lg:col-span-5 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                            <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">
+                                Ficha Técnica - Requerimiento A
+                            </h3>
+                            <span class="px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
+                                Estática
+                            </span>
+                        </div>
+
+                        <!-- Tipo de Estructura -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Tipo de Estructura</span>
+                            <p class="text-base font-bold text-emerald-700 mt-0.5">
+                                Arreglo Unidimensional (Vector Estático)
+                            </p>
+                        </div>
+
+                        <!-- Justificación Técnica Ampliada con Análisis de Ahorro en Memoria -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm space-y-2">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Justificación Arquitectónica y Ahorro en Memoria</span>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Es superior a una lista dinámica para este caso porque el <strong>volumen de datos es fijo, invariante y conocido antes de compilar (30 días)</strong>. Al reservar un bloque contiguo en memoria RAM, permite <strong>acceso directo e instantáneo O(1) mediante índices</strong> (ej. consultar el día 15 en <code class="font-mono text-xs bg-slate-100 px-1 rounded">vector[14]</code>) y aprovecha la <strong>localidad espacial en la caché L1/L2 del procesador</strong>.
+                            </p>
+                            <div class="bg-emerald-50/90 border border-emerald-200 rounded-md p-2.5 text-xs text-slate-700">
+                                <strong class="text-emerald-800 block mb-0.5">💡 Cálculo de Ahorro en Memoria RAM (66.7% menos consumo):</strong>
+                                Almacenar 30 valores <code class="font-mono">float</code> (4 bytes c/u) en este vector consume exactamente <strong>120 bytes</strong> (<code class="font-mono">30 × 4B</code>). Si se usara una lista enlazada en arquitectura de 64 bits, cada nodo exigiría 4 bytes para el dato más <strong>8 bytes extra para el puntero <code class="font-mono">siguiente*</code></strong> (12 bytes por nodo = <strong>360 bytes</strong> en total), triplicando innecesariamente el uso de memoria.
+                            </div>
+                        </div>
+
+                        <!-- Diagrama Explicativo Más Grande y Ampliable al hacer clic -->
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase text-slate-500">Diagrama de Memoria (Vector 1D)</span>
+                                <span class="text-[11px] text-emerald-600 font-semibold">🔍 Clic para ampliar</span>
+                            </div>
+                            <img
+                                src="imagen1.jpg"
+                                alt="Diagrama Vector"
+                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                            >
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECCIÓN 2: REQUERIMIENTO B - PRODUCCIÓN CRUZADA (4 FLORES X 5 INVERNADEROS)
+             Estructura: Arreglo Multidimensional (Matriz 2D Estática)
+             ====================================================================== -->
+        <section id="req-b" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <!-- Encabezado de la Sección 2 -->
+            <div class="bg-slate-800 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-700">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-md bg-emerald-600 text-xs font-bold uppercase tracking-wider">Requerimiento B</span>
+                    <h2 class="text-xl font-bold">Producción Cruzada (4 Flores x 5 Invernaderos)</h2>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 text-emerald-400 px-3 py-1 rounded border border-slate-700">
+                    Declaración lógica: int produccion[4][5];
+                </span>
+            </div>
+
+            <!-- Cuerpo de la Sección 2 -->
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                <!-- Columna Izquierda (7 de 12 columnas): Cuadrícula Interactiva 4x5 con Responsive Optimizado -->
+                <div class="lg:col-span-7 space-y-5 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Matriz Bidimensional Interactiva (Tallos Cortados)</h3>
+                                <p class="text-sm text-slate-600">
+                                    Edita las cantidades en cualquier celda <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono text-xs">[fila][columna]</code> y ejecuta el recorrido matricial.
+                                </p>
+                            </div>
+
+                            <!-- Botón principal requerido para recorrer la matriz y sumar la producción -->
+                            <button
+                                id="btn-calcular-matriz"
+                                type="button"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                            >
+                                <span>Calcular Producción Total</span>
+                            </button>
+                        </div>
+
+                        <!-- Tabla 4x5 optimizada para verse al 100% sin recortar columnas en escritorio y adaptable en móvil -->
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                            <table class="w-full table-fixed min-w-[520px] text-xs sm:text-sm text-left border-collapse">
+                                <thead class="bg-slate-800 text-slate-100 text-[11px] sm:text-xs uppercase">
+                                    <tr>
+                                        <th class="w-[22%] py-2.5 px-2.5 border-r border-slate-700 sticky left-0 z-10 bg-slate-800">
+                                            Flor <span class="text-emerald-400 font-mono">[i]</span> \ Inv. <span class="text-emerald-400 font-mono">[j]</span>
+                                        </th>
+                                        <th class="w-[13%] py-2.5 px-1 text-center">Inv. 1 <span class="block text-[10px] font-mono text-emerald-400">[j=0]</span></th>
+                                        <th class="w-[13%] py-2.5 px-1 text-center">Inv. 2 <span class="block text-[10px] font-mono text-emerald-400">[j=1]</span></th>
+                                        <th class="w-[13%] py-2.5 px-1 text-center">Inv. 3 <span class="block text-[10px] font-mono text-emerald-400">[j=2]</span></th>
+                                        <th class="w-[13%] py-2.5 px-1 text-center">Inv. 4 <span class="block text-[10px] font-mono text-emerald-400">[j=3]</span></th>
+                                        <th class="w-[13%] py-2.5 px-1 text-center">Inv. 5 <span class="block text-[10px] font-mono text-emerald-400">[j=4]</span></th>
+                                        <th class="w-[13%] py-2.5 px-1.5 text-center bg-emerald-900 text-emerald-200">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <!-- El cuerpo de la matriz contiene las 20 celdas con inputs elásticos w-full -->
+                                <tbody id="tabla-matriz-body" class="divide-y divide-slate-200 bg-white">
+                                    <!-- Fila 0: Rosas -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-2 px-2.5 font-semibold text-slate-800 bg-slate-50 border-r border-slate-200 sticky left-0 z-10">
+                                            Rosas <span class="block text-[10px] font-mono text-slate-500">[i=0]</span>
+                                        </td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[0][0]</span><input type="number" min="0" value="120" data-row="0" data-col="0" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[0][1]</span><input type="number" min="0" value="150" data-row="0" data-col="1" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[0][2]</span><input type="number" min="0" value="135" data-row="0" data-col="2" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[0][3]</span><input type="number" min="0" value="140" data-row="0" data-col="3" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[0][4]</span><input type="number" min="0" value="160" data-row="0" data-col="4" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td id="subtotal-fila-0" class="py-2 px-1.5 text-center font-mono font-bold text-emerald-700 bg-emerald-50/60">705</td>
+                                    </tr>
+
+                                    <!-- Fila 1: Claveles -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-2 px-2.5 font-semibold text-slate-800 bg-slate-50 border-r border-slate-200 sticky left-0 z-10">
+                                            Claveles <span class="block text-[10px] font-mono text-slate-500">[i=1]</span>
+                                        </td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[1][0]</span><input type="number" min="0" value="95" data-row="1" data-col="0" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[1][1]</span><input type="number" min="0" value="110" data-row="1" data-col="1" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[1][2]</span><input type="number" min="0" value="105" data-row="1" data-col="2" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[1][3]</span><input type="number" min="0" value="125" data-row="1" data-col="3" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[1][4]</span><input type="number" min="0" value="100" data-row="1" data-col="4" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td id="subtotal-fila-1" class="py-2 px-1.5 text-center font-mono font-bold text-emerald-700 bg-emerald-50/60">535</td>
+                                    </tr>
+
+                                    <!-- Fila 2: Crisantemos -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-2 px-2.5 font-semibold text-slate-800 bg-slate-50 border-r border-slate-200 sticky left-0 z-10">
+                                            Crisantemos <span class="block text-[10px] font-mono text-slate-500">[i=2]</span>
+                                        </td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[2][0]</span><input type="number" min="0" value="80" data-row="2" data-col="0" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[2][1]</span><input type="number" min="0" value="90" data-row="2" data-col="1" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[2][2]</span><input type="number" min="0" value="115" data-row="2" data-col="2" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[2][3]</span><input type="number" min="0" value="105" data-row="2" data-col="3" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[2][4]</span><input type="number" min="0" value="95" data-row="2" data-col="4" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td id="subtotal-fila-2" class="py-2 px-1.5 text-center font-mono font-bold text-emerald-700 bg-emerald-50/60">485</td>
+                                    </tr>
+
+                                    <!-- Fila 3: Astromelias -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-2 px-2.5 font-semibold text-slate-800 bg-slate-50 border-r border-slate-200 sticky left-0 z-10">
+                                            Astromelias <span class="block text-[10px] font-mono text-slate-500">[i=3]</span>
+                                        </td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[3][0]</span><input type="number" min="0" value="130" data-row="3" data-col="0" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[3][1]</span><input type="number" min="0" value="120" data-row="3" data-col="1" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[3][2]</span><input type="number" min="0" value="140" data-row="3" data-col="2" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[3][3]</span><input type="number" min="0" value="110" data-row="3" data-col="3" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td class="p-1.5 text-center"><span class="block text-[10px] font-mono text-slate-400 mb-0.5">[3][4]</span><input type="number" min="0" value="150" data-row="3" data-col="4" class="celda-matriz w-full text-center font-mono text-xs sm:text-sm py-1 px-1 border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></td>
+                                        <td id="subtotal-fila-3" class="py-2 px-1.5 text-center font-mono font-bold text-emerald-700 bg-emerald-50/60">650</td>
+                                    </tr>
+                                </tbody>
+
+                                <!-- Pie de tabla: Subtotales por Columna (Invernaderos) y Total General -->
+                                <tfoot class="bg-slate-100 border-t-2 border-slate-300 font-mono text-xs">
+                                    <tr>
+                                        <td class="py-2.5 px-2.5 font-sans font-bold text-slate-700 border-r border-slate-200 sticky left-0 z-10 bg-slate-100">
+                                            Subtotal Inv.
+                                        </td>
+                                        <td id="subtotal-col-0" class="py-2.5 px-1 text-center font-bold text-slate-800">425</td>
+                                        <td id="subtotal-col-1" class="py-2.5 px-1 text-center font-bold text-slate-800">470</td>
+                                        <td id="subtotal-col-2" class="py-2.5 px-1 text-center font-bold text-slate-800">495</td>
+                                        <td id="subtotal-col-3" class="py-2.5 px-1 text-center font-bold text-slate-800">480</td>
+                                        <td id="subtotal-col-4" class="py-2.5 px-1 text-center font-bold text-slate-800">505</td>
+                                        <td id="total-matriz-tabla" class="py-2.5 px-1.5 text-center font-extrabold text-xs sm:text-sm bg-emerald-600 text-white">2,375</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Banner de Resultado del Recorrido Matricial -->
+                    <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 border border-slate-700">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold block">
+                                Resultado del Doble Ciclo Anidado (4 Filas × 5 Columnas = 20 Celdas)
+                            </span>
+                            <p id="detalle-calculo-matriz" class="text-xs text-slate-300 mt-0.5">
+                                Presiona "Calcular Producción Total" para recorrer la matriz bidimensional y actualizar los acumuladores.
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">Producción Total Acumulada</span>
+                            <span id="resultado-produccion-total" class="text-2xl font-extrabold text-emerald-400 font-mono">
+                                2,375 tallos
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (5 de 12 columnas): Ficha Técnica Visible -->
+                <aside class="lg:col-span-5 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                            <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">
+                                Ficha Técnica - Requerimiento B
+                            </h3>
+                            <span class="px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
+                                Estática 2D
+                            </span>
+                        </div>
+
+                        <!-- Tipo de Estructura -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Tipo de Estructura</span>
+                            <p class="text-base font-bold text-emerald-700 mt-0.5">
+                                Arreglo Multidimensional (Matriz 2D Estática)
+                            </p>
+                        </div>
+
+                        <!-- Justificación Técnica Ampliada con Análisis de Ahorro en Memoria -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm space-y-2">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Justificación Arquitectónica y Ahorro en Memoria</span>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Se eligió sobre múltiples arreglos 1D sueltos o listas dinámicas porque <strong>permite cruzar espacialmente dos ejes fijos y ortogonales (Eje Y: 4 variedades de flores × Eje X: 5 invernaderos)</strong> bajo un único identificador. Garantiza integridad relacional entre fila y columna, acceso instantáneo <code class="font-mono text-xs bg-slate-100 px-1 rounded">O(1)</code> mediante coordenadas <code class="font-mono text-xs bg-slate-100 px-1 rounded">matriz[i][j]</code> y recorrido sistemático con dos bucles anidados.
+                            </p>
+                            <div class="bg-emerald-50/90 border border-emerald-200 rounded-md p-2.5 text-xs text-slate-700">
+                                <strong class="text-emerald-800 block mb-0.5">💡 Eficiencia en Memoria Contigua (Row-Major Order):</strong>
+                                Las 20 celdas (<code class="font-mono">4 × 5</code> enteros de 4 bytes) se almacenan en un solo bloque plano de <strong>80 bytes contiguos</strong> (<code class="font-mono">Dir(i,j) = Base + ((i × 5) + j) × 4</code>). Frente a crear 4 vectores independientes o listas anidadas, elimina descriptores repetidos, cabeceras de objetos y punteros secundarios, ahorrando más del <strong>65% de sobrecarga en RAM</strong>.
+                            </div>
+                        </div>
+
+                        <!-- Diagrama Explicativo Más Grande y Ampliable al hacer clic -->
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase text-slate-500">Diagrama de Coordenadas 2D (Matriz 4×5)</span>
+                                <span class="text-[11px] text-emerald-600 font-semibold">🔍 Clic para ampliar</span>
+                            </div>
+                            <img
+                                src="imagen2.jpg"
+                                alt="Diagrama Matriz"
+                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                            >
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECCIÓN 3: REQUERIMIENTO C - REGISTRO DE RECOLECTORES TEMPORALES
+             Estructura: Lista Dinámica (Nodos Enlazados)
+             ====================================================================== -->
+        <section id="req-c" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <!-- Encabezado de la Sección 3 -->
+            <div class="bg-slate-800 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-700">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-md bg-emerald-600 text-xs font-bold uppercase tracking-wider">Requerimiento C</span>
+                    <h2 class="text-xl font-bold">Registro de Recolectores Temporales</h2>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 text-emerald-400 px-3 py-1 rounded border border-slate-700">
+                    Estructura lógica: Nodo { dato, siguiente* } -&gt; NULL
+                </span>
+            </div>
+
+            <!-- Cuerpo de la Sección 3 -->
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                <!-- Columna Izquierda (7 de 12 columnas): Simulador de Lista Enlazada en Tiempo Real -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Gestor Dinámico de Nodos Enlazados en Memoria Heap</h3>
+                            <p class="text-sm text-slate-600">
+                                Ingresa el nombre del recolector temporal. Puedes eliminar el último nodo o hacer clic en el botón <code class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-bold text-xs">✕</code> de <strong>cualquier recolector específico</strong> para observar cómo se re-enlazan los punteros <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono text-xs">-&gt;</code> en tiempo real.
+                            </p>
+                        </div>
+
+                        <!-- Barra de controles: Input de texto + Botones "Agregar Recolector" y "Eliminar Último" -->
+                        <div class="flex flex-col sm:flex-row gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <input
+                                id="input-nombre-recolector"
+                                type="text"
+                                placeholder="Ej. Camila Vargas (Turno Cosecha)"
+                                class="flex-grow px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                            >
+                            <div class="flex gap-2 shrink-0">
+                                <!-- Botón Agregar Recolector -->
+                                <button
+                                    id="btn-agregar-recolector"
+                                    type="button"
+                                    class="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-sm shadow-sm transition-all cursor-pointer"
+                                >
+                                    Agregar Recolector
+                                </button>
+
+                                <!-- Botón Eliminar Último -->
+                                <button
+                                    id="btn-eliminar-ultimo"
+                                    type="button"
+                                    class="px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-semibold text-sm shadow-sm transition-all cursor-pointer"
+                                >
+                                    Eliminar Último
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Indicadores de estado de la Lista Enlazada -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono bg-slate-100 px-4 py-2.5 rounded-lg border border-slate-200">
+                            <span>Nodos Activos en Heap: <strong id="contador-nodos" class="text-emerald-700">0</strong></span>
+                            <span>Puntero HEAD: <strong id="estado-head" class="text-slate-700">NULL</strong></span>
+                            <span id="mensaje-operacion-lista" class="text-slate-500">Lista lista para operar</span>
+                        </div>
+
+                        <!-- Lienzo visual donde se dibujan los Nodos conectados con flechas -> en tiempo real -->
+                        <div class="bg-slate-900 p-5 rounded-xl border-2 border-slate-700 min-h-[240px] flex flex-col justify-between">
+                            <div class="text-xs font-mono text-slate-400 border-b border-slate-800 pb-2 mb-4 flex flex-wrap justify-between gap-2">
+                                <span>ESPACIO DE MEMORIA DINÁMICA (HEAP - ASIGNACIÓN NO CONTIGUA)</span>
+                                <span class="text-emerald-400">Haz clic en [✕] en cualquier nodo para eliminarlo</span>
+                            </div>
+
+                            <!-- Contenedor flexible donde JavaScript inserta las cajas (nodos) y las flechas -> -->
+                            <div id="contenedor-nodos-lista" class="flex flex-wrap items-center gap-2 my-auto py-2">
+                                <!-- Se poblará al cargar con nodos de demostración o al interactuar -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nota pedagógica sobre eliminación de cualquier nodo intermedio o extremo -->
+                    <div class="bg-emerald-50/80 border-l-4 border-emerald-600 p-3.5 rounded-r-lg text-xs text-slate-700">
+                        <strong class="text-emerald-800">¿Cómo se elimina cualquier nodo intermedio?</strong> A diferencia de un arreglo (donde borrar un elemento obliga a desplazar todos los demás), en una Lista Enlazada basta con redirigir el puntero del nodo anterior hacia el nodo siguiente (<code class="font-mono bg-white px-1 py-0.5 rounded border">anterior.siguiente = actual.siguiente</code>), liberando el nodo eliminado en memoria Heap sin mover ningún otro registro.
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (5 de 12 columnas): Ficha Técnica Visible -->
+                <aside class="lg:col-span-5 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                            <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">
+                                Ficha Técnica - Requerimiento C
+                            </h3>
+                            <span class="px-2.5 py-0.5 text-xs font-semibold bg-teal-100 text-teal-800 rounded-full">
+                                Dinámica
+                            </span>
+                        </div>
+
+                        <!-- Tipo de Estructura -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Tipo de Estructura</span>
+                            <p class="text-base font-bold text-emerald-700 mt-0.5">
+                                Lista Dinámica (Nodos Enlazados)
+                            </p>
+                        </div>
+
+                        <!-- Justificación Técnica Ampliada con Análisis de Ahorro en Memoria -->
+                        <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm space-y-2">
+                            <span class="text-xs font-semibold uppercase text-slate-400 block">Justificación Arquitectónica y Ahorro en Memoria</span>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Un arreglo estático fallaría aquí por la <strong>alta fluctuación de personal temporal</strong> entre épocas pico (San Valentín / Madres) y semanas valle. La lista enlazada <strong>asigna y libera memoria en el Heap en tiempo de ejecución</strong> nodo a nodo, permitiendo insertar o retirar a cualquier recolector sin desplazar registros en RAM.
+                            </p>
+                            <div class="bg-emerald-50/90 border border-emerald-200 rounded-md p-2.5 text-xs text-slate-700">
+                                <strong class="text-emerald-800 block mb-0.5">💡 Ahorro de RAM (0% Memoria Ociosa) y Cero Desbordamientos:</strong>
+                                Si se reservara un vector estático para el pico máximo (ej. 500 cupos) pero en temporada baja solo trabajan 15 recolectores, el <strong>97% de la memoria reservada (485 casillas) quedaría desperdiciada</strong>. Y si se declarara pequeño, causaría un <strong>desbordamiento (Overflow)</strong>. Con nodos enlazados, el consumo es 100% proporcional al personal activo y el <em>Garbage Collector</em> recupera cada byte al instante.
+                            </div>
+                        </div>
+
+                        <!-- Diagrama Explicativo Más Grande y Ampliable al hacer clic -->
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase text-slate-500">Diagrama de Nodos Enlazados (Heap)</span>
+                                <span class="text-[11px] text-emerald-600 font-semibold">🔍 Clic para ampliar</span>
+                            </div>
+                            <img
+                                src="imagen3.jpg"
+                                alt="Diagrama Lista Dinámica"
+                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                            >
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO DE 4 ESTUDIANTES)
+             Integrantes: Jhon Fredy Betancur Davila, Cristian Gutierrez,
+             Jose Fernando Higuita y Arnold Diaz.
+             ====================================================================== -->
+        <section id="autoevaluacion" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <!-- Encabezado de la Sección 4 -->
+            <div class="bg-slate-800 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-700">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-md bg-emerald-600 text-xs font-bold uppercase tracking-wider">Sección 4</span>
+                    <h2 class="text-xl font-bold">Autoevaluación y Consultoría (Equipo IU Digital de Antioquia)</h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Botón para alternar la visibilidad del formulario cuando ya fue publicado/ocultado -->
+                    <button
+                        id="btn-mostrar-formulario"
+                        type="button"
+                        class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-md border border-slate-500 transition-colors cursor-pointer"
+                    >
+                        Mostrar Formulario vacio
+                    </button>
+
+                    <!-- Botón rápido para publicar las conclusiones oficiales de los 4 integrantes y ocultar los campos -->
+                    <button
+                        id="btn-autocompletar-ejemplo"
+                        type="button"
+                        class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-3.5 py-1.5 rounded-md border border-emerald-500 transition-colors cursor-pointer"
+                    >
+                        Cargar Respuestas del Equipo
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-8">
+                <!-- Contenedor colapsable del formulario: se limpia y se oculta al publicar las conclusiones -->
+                <div id="contenedor-formulario-equipo" class="space-y-6">
+                    <div class="max-w-3xl">
+                        <h3 class="text-lg font-bold text-slate-800">Formulario Modular de Reflexión Técnica y Trabajo Colaborativo</h3>
+                        <p class="text-sm text-slate-600 mt-1">
+                            Registra los aportes de los 4 integrantes o presiona <strong>"Cargar Respuestas del Equipo"</strong>. Al publicar las conclusiones, los campos del formulario se limpian y se ocultan automáticamente para destacar las tarjetas de evidencia final.
+                        </p>
+                    </div>
+
+                    <!-- Formulario Modular para los 4 Estudiantes -->
+                    <form id="form-autoevaluacion" class="space-y-6" novalidate>
+                        <!-- Grid 2x2 en pantallas medianas/grandes para los 4 módulos de estudiantes -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <!-- ==================== MÓDULO ESTUDIANTE 1 ==================== -->
+                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #1</span>
+                                    <span class="text-xs text-slate-500 font-mono">Rol: Arquitecto de Datos</span>
+                                </div>
+
+                                <div>
+                                    <label for="nombre-est-1" class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                        Nombre del Estudiante
+                                    </label>
+                                    <input
+                                        id="nombre-est-1"
+                                        type="text"
+                                        placeholder="Ej. Jhon Fredy Betancur Davila"
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="resp1-est-1" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
+                                    </label>
+                                    <textarea
+                                        id="resp1-est-1"
+                                        rows="3"
+                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <div>
+                                    <label for="resp2-est-1" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
+                                    </label>
+                                    <textarea
+                                        id="resp2-est-1"
+                                        rows="3"
+                                        placeholder="Describe el aporte colaborativo del equipo..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <!-- ==================== MÓDULO ESTUDIANTE 2 ==================== -->
+                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #2</span>
+                                    <span class="text-xs text-slate-500 font-mono">Rol: Líder Frontend &amp; DOM</span>
+                                </div>
+
+                                <div>
+                                    <label for="nombre-est-2" class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                        Nombre del Estudiante
+                                    </label>
+                                    <input
+                                        id="nombre-est-2"
+                                        type="text"
+                                        placeholder="Ej. Cristian Gutierrez"
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="resp1-est-2" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
+                                    </label>
+                                    <textarea
+                                        id="resp1-est-2"
+                                        rows="3"
+                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <div>
+                                    <label for="resp2-est-2" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
+                                    </label>
+                                    <textarea
+                                        id="resp2-est-2"
+                                        rows="3"
+                                        placeholder="Describe el aporte colaborativo del equipo..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <!-- ==================== MÓDULO ESTUDIANTE 3 ==================== -->
+                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #3</span>
+                                    <span class="text-xs text-slate-500 font-mono">Rol: Analista de Algoritmos</span>
+                                </div>
+
+                                <div>
+                                    <label for="nombre-est-3" class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                        Nombre del Estudiante
+                                    </label>
+                                    <input
+                                        id="nombre-est-3"
+                                        type="text"
+                                        placeholder="Ej. Jose Fernando Higuita"
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="resp1-est-3" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
+                                    </label>
+                                    <textarea
+                                        id="resp1-est-3"
+                                        rows="3"
+                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <div>
+                                    <label for="resp2-est-3" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
+                                    </label>
+                                    <textarea
+                                        id="resp2-est-3"
+                                        rows="3"
+                                        placeholder="Describe el aporte colaborativo del equipo..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <!-- ==================== MÓDULO ESTUDIANTE 4 ==================== -->
+                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #4</span>
+                                    <span class="text-xs text-slate-500 font-mono">Rol: Diseñador UX/UI &amp; QA</span>
+                                </div>
+
+                                <div>
+                                    <label for="nombre-est-4" class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                        Nombre del Estudiante
+                                    </label>
+                                    <input
+                                        id="nombre-est-4"
+                                        type="text"
+                                        placeholder="Ej. Arnold Diaz"
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="resp1-est-4" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
+                                    </label>
+                                    <textarea
+                                        id="resp1-est-4"
+                                        rows="3"
+                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <div>
+                                    <label for="resp2-est-4" class="block text-xs font-semibold text-slate-700 mb-1">
+                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
+                                    </label>
+                                    <textarea
+                                        id="resp2-est-4"
+                                        rows="3"
+                                        placeholder="Describe el aporte colaborativo del equipo..."
+                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        required
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Botón Central requerido: "Publicar Conclusiones del Equipo" -->
+                        <div class="flex justify-center pt-2">
+                            <button
+                                id="btn-publicar-conclusiones"
+                                type="submit"
+                                class="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base shadow-lg hover:shadow-emerald-600/25 transition-all cursor-pointer"
+                            >
+                                Publicar Conclusiones del Equipo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contenedor donde se renderizan dinámicamente las 4 Tarjetas Profesionales (Cards) -->
+                <div id="seccion-evidencia-publicada" class="hidden pt-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">
+                            Evidencia Final de Consultoría — Conclusiones Publicadas
+                        </h3>
+                        <span id="estado-publicacion" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+                            Pendiente de publicación
+                        </span>
+                    </div>
+
+                    <!-- Grid para las 4 tarjetas renderizadas por JavaScript -->
+                    <div id="contenedor-tarjetas-equipo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         MODAL DE ZOOM (LIGHTBOX) PARA VER LOS DIAGRAMAS DE MEMORIA EN GRANDE
+         ========================================================================== -->
+    <div
+        id="modal-zoom-diagrama"
+        class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-slate-900 border border-emerald-500/50 rounded-2xl max-w-4xl w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h4 id="titulo-modal-diagrama" class="text-base font-bold text-emerald-400 font-mono">
+                    Vista Ampliada del Diagrama de Memoria
+                </h4>
+                <button
+                    id="btn-cerrar-modal-diagrama"
+                    type="button"
+                    class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-200 hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                >
+                    ✕ Cerrar (ESC)
+                </button>
+            </div>
+            <div class="bg-slate-950 rounded-xl p-3 flex items-center justify-center">
+                <img id="imagen-modal-diagrama" src="" alt="Diagrama Ampliado" class="w-full max-h-[75vh] object-contain rounded">
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         PIE DE PÁGINA SEMÁNTICO (<footer>)
+         ========================================================================== -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left space-y-1">
+                <p class="text-white font-bold text-sm">
+                    Institución Universitaria Digital de Antioquia (IU Digital de Antioquia)
+                </p>
+                <p>
+                    Equipo Consultor: <strong class="text-emerald-400">Jhon Fredy Betancur Davila</strong> • <strong class="text-emerald-400">Cristian Gutierrez</strong> • <strong class="text-emerald-400">Jose Fernando Higuita</strong> • <strong class="text-emerald-400">Arnold Diaz</strong>
+                </p>
+            </div>
+            <p class="font-mono text-emerald-400 bg-slate-800 px-3 py-1.5 rounded border border-slate-700">
+                HTML5 Semántico + Tailwind CSS + Vanilla JS Comentado
+            </p>
+        </div>
+    </footer>
+
+    <!-- ==========================================================================
+         BLOQUE DE LÓGICA EN VANILLA JAVASCRIPT
+         Exhaustivamente comentado línea por línea y bloque por bloque para servir
+         como material de estudio a estudiantes de Ingeniería de Software.
+         ========================================================================== -->
+    <script>
+        /* ========================================================================
+         * MÓDULO AUXILIAR: DIAGRAMAS TÉCNICOS DE ALTA LEGIBILIDAD Y MODAL DE ZOOM
+         * Provee diagramas vectoriales nítidos como respaldo para imagen1.jpg,
+         * imagen2.jpg e imagen3.jpg, y habilita la ampliación (Lightbox) al hacer clic.
+         * ======================================================================== */
+        function configurarDiagramasYZoom() {
+            // Diccionario con diagramas técnicos vectoriales (SVG) de mayor tamaño y legibilidad
+            const diagramasRespaldo = {
+                'imagen1.jpg': `data:image/svg+xml;utf8,` + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240">
+                        <rect width="640" height="240" fill="#0f172a" rx="10"/>
+                        <text x="24" y="34" fill="#34d399" font-family="monospace" font-size="16" font-weight="bold">VECTOR ESTÁTICO 1D (MEMORIA CONTIGUA - 30 DÍAS)</text>
+                        <g transform="translate(24, 58)">
+                            <rect x="0" y="0" width="95" height="90" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="47" y="28" fill="#a7f3d0" font-family="monospace" font-size="13" text-anchor="middle">Índice [0]</text>
+                            <text x="47" y="58" fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold" text-anchor="middle">18.4°C</text>
+                            <text x="47" y="112" fill="#94a3b8" font-family="monospace" font-size="12" text-anchor="middle">0x1000</text>
+
+                            <rect x="95" y="0" width="95" height="90" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="142" y="28" fill="#a7f3d0" font-family="monospace" font-size="13" text-anchor="middle">Índice [1]</text>
+                            <text x="142" y="58" fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold" text-anchor="middle">19.1°C</text>
+                            <text x="142" y="112" fill="#94a3b8" font-family="monospace" font-size="12" text-anchor="middle">0x1004</text>
+
+                            <rect x="190" y="0" width="95" height="90" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="237" y="28" fill="#a7f3d0" font-family="monospace" font-size="13" text-anchor="middle">Índice [2]</text>
+                            <text x="237" y="58" fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold" text-anchor="middle">21.0°C</text>
+                            <text x="237" y="112" fill="#94a3b8" font-family="monospace" font-size="12" text-anchor="middle">0x1008</text>
+
+                            <rect x="285" y="0" width="90" height="90" fill="#1e293b" stroke="#475569" stroke-width="2.5"/>
+                            <text x="330" y="52" fill="#cbd5e1" font-family="monospace" font-size="22" font-weight="bold" text-anchor="middle">...</text>
+                            <text x="330" y="112" fill="#64748b" font-family="monospace" font-size="12" text-anchor="middle">Contiguo</text>
+
+                            <rect x="375" y="0" width="105" height="90" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="427" y="28" fill="#a7f3d0" font-family="monospace" font-size="13" text-anchor="middle">Índice [28]</text>
+                            <text x="427" y="58" fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold" text-anchor="middle">17.8°C</text>
+                            <text x="427" y="112" fill="#94a3b8" font-family="monospace" font-size="12" text-anchor="middle">0x1070</text>
+
+                            <rect x="480" y="0" width="112" height="90" fill="#047857" stroke="#34d399" stroke-width="2.5"/>
+                            <text x="536" y="28" fill="#a7f3d0" font-family="monospace" font-size="13" text-anchor="middle">Índice [29]</text>
+                            <text x="536" y="58" fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold" text-anchor="middle">20.2°C</text>
+                            <text x="536" y="112" fill="#94a3b8" font-family="monospace" font-size="12" text-anchor="middle">0x1074</text>
+                        </g>
+                        <text x="24" y="212" fill="#e2e8f0" font-family="sans-serif" font-size="14" font-weight="bold">Fórmula de Acceso Directo O(1): Dir(i) = Base (0x1000) + (i × 4 bytes)</text>
+                    </svg>
+                `),
+                'imagen2.jpg': `data:image/svg+xml;utf8,` + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260">
+                        <rect width="640" height="260" fill="#0f172a" rx="10"/>
+                        <text x="24" y="32" fill="#34d399" font-family="monospace" font-size="16" font-weight="bold">MATRIZ ESTÁTICA 2D: 4 FLORES (FILAS) × 5 INVERNADEROS (COLS)</text>
+                        <g transform="translate(24, 48)" font-family="monospace" font-size="13">
+                            <rect x="0" y="0" width="95" height="32" fill="#0f172a" stroke="#475569"/><text x="47" y="21" fill="#94a3b8" text-anchor="middle">i \ j</text>
+                            <rect x="95" y="0" width="98" height="32" fill="#1e293b" stroke="#475569"/><text x="144" y="21" fill="#34d399" font-weight="bold" text-anchor="middle">Col [0]</text>
+                            <rect x="193" y="0" width="98" height="32" fill="#1e293b" stroke="#475569"/><text x="242" y="21" fill="#34d399" font-weight="bold" text-anchor="middle">Col [1]</text>
+                            <rect x="291" y="0" width="98" height="32" fill="#1e293b" stroke="#475569"/><text x="340" y="21" fill="#34d399" font-weight="bold" text-anchor="middle">Col [2]</text>
+                            <rect x="389" y="0" width="98" height="32" fill="#1e293b" stroke="#475569"/><text x="438" y="21" fill="#34d399" font-weight="bold" text-anchor="middle">Col [3]</text>
+                            <rect x="487" y="0" width="98" height="32" fill="#1e293b" stroke="#475569"/><text x="536" y="21" fill="#34d399" font-weight="bold" text-anchor="middle">Col [4]</text>
+
+                            <rect x="0" y="32" width="95" height="34" fill="#1e293b" stroke="#475569"/><text x="47" y="54" fill="#a7f3d0" font-weight="bold" text-anchor="middle">Fila [0]</text>
+                            <rect x="95" y="32" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="144" y="54" fill="#fff" text-anchor="middle">[0][0]</text>
+                            <rect x="193" y="32" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="242" y="54" fill="#fff" text-anchor="middle">[0][1]</text>
+                            <rect x="291" y="32" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="340" y="54" fill="#fff" text-anchor="middle">[0][2]</text>
+                            <rect x="389" y="32" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="438" y="54" fill="#fff" text-anchor="middle">[0][3]</text>
+                            <rect x="487" y="32" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="536" y="54" fill="#fff" text-anchor="middle">[0][4]</text>
+
+                            <rect x="0" y="66" width="95" height="34" fill="#1e293b" stroke="#475569"/><text x="47" y="88" fill="#a7f3d0" font-weight="bold" text-anchor="middle">Fila [1]</text>
+                            <rect x="95" y="66" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="144" y="88" fill="#fff" text-anchor="middle">[1][0]</text>
+                            <rect x="193" y="66" width="98" height="34" fill="#047857" stroke="#34d399"/><text x="242" y="88" fill="#fff" font-weight="bold" text-anchor="middle">[1][1]</text>
+                            <rect x="291" y="66" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="340" y="88" fill="#fff" text-anchor="middle">[1][2]</text>
+                            <rect x="389" y="66" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="438" y="88" fill="#fff" text-anchor="middle">[1][3]</text>
+                            <rect x="487" y="66" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="536" y="88" fill="#fff" text-anchor="middle">[1][4]</text>
+
+                            <rect x="0" y="100" width="95" height="34" fill="#1e293b" stroke="#475569"/><text x="47" y="122" fill="#a7f3d0" font-weight="bold" text-anchor="middle">Fila [2]</text>
+                            <rect x="95" y="100" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="144" y="122" fill="#fff" text-anchor="middle">[2][0]</text>
+                            <rect x="193" y="100" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="242" y="122" fill="#fff" text-anchor="middle">[2][1]</text>
+                            <rect x="291" y="100" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="340" y="122" fill="#fff" text-anchor="middle">[2][2]</text>
+                            <rect x="389" y="100" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="438" y="122" fill="#fff" text-anchor="middle">[2][3]</text>
+                            <rect x="487" y="100" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="536" y="122" fill="#fff" text-anchor="middle">[2][4]</text>
+
+                            <rect x="0" y="134" width="95" height="34" fill="#1e293b" stroke="#475569"/><text x="47" y="156" fill="#a7f3d0" font-weight="bold" text-anchor="middle">Fila [3]</text>
+                            <rect x="95" y="134" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="144" y="156" fill="#fff" text-anchor="middle">[3][0]</text>
+                            <rect x="193" y="134" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="242" y="156" fill="#fff" text-anchor="middle">[3][1]</text>
+                            <rect x="291" y="134" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="340" y="156" fill="#fff" text-anchor="middle">[3][2]</text>
+                            <rect x="389" y="134" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="438" y="156" fill="#fff" text-anchor="middle">[3][3]</text>
+                            <rect x="487" y="134" width="98" height="34" fill="#064e3b" stroke="#10b981"/><text x="536" y="156" fill="#fff" text-anchor="middle">[3][4]</text>
+                        </g>
+                        <text x="24" y="238" fill="#e2e8f0" font-family="sans-serif" font-size="14" font-weight="bold">Recorrido por Coordenadas O(Filas × Columnas): 4 × 5 = 20 posiciones fijas</text>
+                    </svg>
+                `),
+                'imagen3.jpg': `data:image/svg+xml;utf8,` + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240">
+                        <rect width="640" height="240" fill="#0f172a" rx="10"/>
+                        <text x="24" y="34" fill="#34d399" font-family="monospace" font-size="16" font-weight="bold">LISTA ENLAZADA DINÁMICA (NODOS Y PUNTEROS EN HEAP)</text>
+                        <g transform="translate(22, 68)" font-family="monospace">
+                            <rect x="0" y="0" width="120" height="72" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <line x1="82" y1="0" x2="82" y2="72" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="41" y="30" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle">Nodo 1</text>
+                            <text x="41" y="54" fill="#a7f3d0" font-size="12" text-anchor="middle">0x4A10</text>
+                            <text x="101" y="42" fill="#34d399" font-size="14" font-weight="bold" text-anchor="middle">sig*</text>
+
+                            <text x="148" y="43" fill="#34d399" font-size="24" font-weight="bold" text-anchor="middle">-&gt;</text>
+
+                            <rect x="175" y="0" width="120" height="72" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <line x1="257" y1="0" x2="257" y2="72" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="216" y="30" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle">Nodo 2</text>
+                            <text x="216" y="54" fill="#a7f3d0" font-size="12" text-anchor="middle">0x8F20</text>
+                            <text x="276" y="42" fill="#34d399" font-size="14" font-weight="bold" text-anchor="middle">sig*</text>
+
+                            <text x="323" y="43" fill="#34d399" font-size="24" font-weight="bold" text-anchor="middle">-&gt;</text>
+
+                            <rect x="350" y="0" width="120" height="72" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2.5"/>
+                            <line x1="432" y1="0" x2="432" y2="72" stroke="#10b981" stroke-width="2.5"/>
+                            <text x="391" y="30" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle">Nodo 3</text>
+                            <text x="391" y="54" fill="#a7f3d0" font-size="12" text-anchor="middle">0x2C90</text>
+                            <text x="451" y="42" fill="#34d399" font-size="14" font-weight="bold" text-anchor="middle">sig*</text>
+
+                            <text x="498" y="43" fill="#34d399" font-size="24" font-weight="bold" text-anchor="middle">-&gt;</text>
+
+                            <rect x="522" y="12" width="74" height="48" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                            <text x="559" y="42" fill="#fca5a5" font-size="15" font-weight="bold" text-anchor="middle">NULL</text>
+                        </g>
+                        <text x="24" y="205" fill="#e2e8f0" font-family="sans-serif" font-size="14" font-weight="bold">Eliminación de cualquier nodo: anterior.siguiente = actual.siguiente</text>
+                    </svg>
+                `)
+            };
+
+            // Referencias al Modal Lightbox para ampliar diagramas
+            const modalZoom = document.getElementById('modal-zoom-diagrama');
+            const imgModal = document.getElementById('imagen-modal-diagrama');
+            const tituloModal = document.getElementById('titulo-modal-diagrama');
+            const btnCerrarModal = document.getElementById('btn-cerrar-modal-diagrama');
+
+            // Seleccionamos todas las imágenes de diagramas para configurar su respaldo y su evento de clic (zoom)
+            const imagenes = document.querySelectorAll('img.diagrama-ampliable');
+            imagenes.forEach((img) => {
+                const srcOriginal = img.getAttribute('src');
+                if (diagramasRespaldo[srcOriginal]) {
+                    const aplicarDiagramaRespaldo = () => {
+                        img.src = diagramasRespaldo[srcOriginal];
+                    };
+
+                    if (img.complete && img.naturalWidth === 0) {
+                        aplicarDiagramaRespaldo();
+                    } else {
+                        img.addEventListener('error', aplicarDiagramaRespaldo, { once: true });
+                    }
+                }
+
+                // Al hacer clic en el diagrama, se abre el Modal con la imagen en tamaño grande
+                img.addEventListener('click', () => {
+                    imgModal.src = img.src;
+                    tituloModal.textContent = img.alt + ' — Vista Detallada de Arquitectura';
+                    modalZoom.classList.remove('hidden');
+                });
+            });
+
+            // Eventos para cerrar el Modal de Zoom
+            if (btnCerrarModal && modalZoom) {
+                btnCerrarModal.addEventListener('click', () => modalZoom.classList.add('hidden'));
+                modalZoom.addEventListener('click', (e) => {
+                    if (e.target === modalZoom) modalZoom.classList.add('hidden');
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') modalZoom.classList.add('hidden');
+                });
+            }
+        }
+
+        /* ========================================================================
+         * SECCIÓN 1: LÓGICA DEL REQUERIMIENTO A - VECTOR ESTÁTICO (30 DÍAS)
+         * Incluye generación de las 30 temperaturas y el botón "Limpiar Tablero".
+         * ======================================================================== */
+
+        // Constante que define el tamaño fijo e inmutable del vector (30 días del mes comercial)
+        const TAMANO_VECTOR_DIAS = 30;
+
+        // Pre-reservamos el arreglo unidimensional estático en memoria con 30 posiciones iniciales
+        const vectorTemperaturas = new Array(TAMANO_VECTOR_DIAS).fill(0);
+
+        // Referencias a los elementos del DOM de la Sección 1
+        const btnGenerarTemperaturas = document.getElementById('btn-generar-temperaturas');
+        const btnLimpiarTemperaturas = document.getElementById('btn-limpiar-temperaturas');
+        const contenedorVector = document.getElementById('contenedor-vector');
+        const spanPromedio = document.getElementById('temp-promedio');
+        const spanMin = document.getElementById('temp-min');
+        const spanMax = document.getElementById('temp-max');
+        const spanEstadoVector = document.getElementById('estado-vector');
+
+        /**
+         * Función que simula la generación y almacenamiento de 30 temperaturas
+         * en un arreglo unidimensional y renderiza las 30 tarjetas en el DOM.
+         */
+        function generarTemperaturasMensuales() {
+            // Limpiamos el contenedor visual antes de volver a renderizar las 30 casillas del vector
+            contenedorVector.innerHTML = '';
+
+            // Variables acumuladoras para calcular estadísticas en un solo recorrido lineal O(N)
+            let sumaTemperaturas = 0;
+            let tempMinima = Infinity;
+            let tempMaxima = -Infinity;
+
+            // Ciclo 'for' clásico que recorre los índices contiguos desde i = 0 hasta i = 29 (30 posiciones)
+            for (let i = 0; i < TAMANO_VECTOR_DIAS; i++) {
+                // Generamos una temperatura aleatoria realista para invernadero de flores (entre 12.0 °C y 26.5 °C)
+                const temperaturaAleatoria = Number((12 + Math.random() * 14.5).toFixed(1));
+
+                // Almacenamos el dato directamente en el índice 'i' del vector estático: acceso O(1)
+                vectorTemperaturas[i] = temperaturaAleatoria;
+
+                // Actualizamos la suma acumulada y los valores extremos (mínimo y máximo)
+                sumaTemperaturas += temperaturaAleatoria;
+                if (temperaturaAleatoria < tempMinima) tempMinima = temperaturaAleatoria;
+                if (temperaturaAleatoria > tempMaxima) tempMaxima = temperaturaAleatoria;
+
+                // Simulamos la dirección física contigua en memoria RAM (Base 0x1000 + desplazamiento i * 4 bytes)
+                const direccionMemoriaHex = '0x' + (0x1000 + (i * 4)).toString(16).toUpperCase();
+
+                // Determinamos el estilo visual según el rango térmico para las flores
+                let colorBorde = 'border-emerald-500/60 bg-emerald-950/60 text-emerald-300';
+                let etiquetaClima = 'Óptimo';
+                if (temperaturaAleatoria < 15.0) {
+                    colorBorde = 'border-sky-500/60 bg-sky-950/60 text-sky-300';
+                    etiquetaClima = 'Frío';
+                } else if (temperaturaAleatoria > 23.0) {
+                    colorBorde = 'border-amber-500/60 bg-amber-950/60 text-amber-300';
+                    etiquetaClima = 'Cálido';
+                }
+
+                // Creamos dinámicamente el elemento HTML (tarjeta pequeña) para representar la casilla vector[i]
+                const tarjetaDia = document.createElement('div');
+                tarjetaDia.className = `animate-node p-2.5 rounded-lg border ${colorBorde} flex flex-col justify-between shadow-sm hover:scale-105 transition-transform`;
+                tarjetaDia.style.animationDelay = `${i * 10}ms`;
+
+                // Inyectamos la estructura interna de la tarjeta con el índice [i], el día y la temperatura
+                tarjetaDia.innerHTML = `
+                    <div class="flex items-center justify-between text-[10px] font-mono opacity-80">
+                        <span class="font-bold">[${i}]</span>
+                        <span>${direccionMemoriaHex}</span>
+                    </div>
+                    <div class="my-1 text-center">
+                        <span class="text-xs text-slate-300 block">Día ${i + 1}</span>
+                        <span class="text-base font-extrabold font-mono text-white">${vectorTemperaturas[i].toFixed(1)}°C</span>
+                    </div>
+                    <div class="text-[10px] text-center uppercase tracking-wider font-semibold opacity-90 border-t border-white/10 pt-1">
+                        ${etiquetaClima}
+                    </div>
+                `;
+
+                // Insertamos la tarjeta dentro del contenedor visual del vector en el DOM
+                contenedorVector.appendChild(tarjetaDia);
+            }
+
+            // Calculamos el promedio dividiendo la suma total entre la constante fija TAMANO_VECTOR_DIAS (30)
+            const promedioMensual = (sumaTemperaturas / TAMANO_VECTOR_DIAS).toFixed(1);
+
+            // Actualizamos los indicadores estadísticos en el DOM
+            spanPromedio.textContent = `${promedioMensual} °C`;
+            spanMin.textContent = `${tempMinima.toFixed(1)} °C`;
+            spanMax.textContent = `${tempMaxima.toFixed(1)} °C`;
+            spanEstadoVector.textContent = `30/30 índices ocupados (120 bytes contiguos)`;
+            spanEstadoVector.className = 'text-emerald-400 font-semibold';
+        }
+
+        /**
+         * Función que limpia el tablero del vector, reiniciando las 30 posiciones
+         * en memoria a 0 y restableciendo las métricas en el DOM.
+         */
+        function limpiarTableroTemperaturas() {
+            // Reiniciamos los 30 valores del arreglo estático en memoria a 0
+            vectorTemperaturas.fill(0);
+
+            // Restauramos el mensaje informativo en el contenedor del DOM
+            contenedorVector.innerHTML = `
+                <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+                    Tablero limpio. Haz clic en <strong class="text-emerald-400">"Generar 30 días de Temperatura"</strong> para poblar nuevamente los 30 índices del vector.
+                </div>
+            `;
+
+            // Restablecemos los indicadores estadísticos
+            spanPromedio.textContent = '-- °C';
+            spanMin.textContent = '-- °C';
+            spanMax.textContent = '-- °C';
+            spanEstadoVector.textContent = 'Vector reiniciado (0/30 asignados)';
+            spanEstadoVector.className = 'text-amber-400';
+        }
+
+        // Escuchadores de evento 'click' para generar y limpiar las 30 temperaturas
+        btnGenerarTemperaturas.addEventListener('click', generarTemperaturasMensuales);
+        btnLimpiarTemperaturas.addEventListener('click', limpiarTableroTemperaturas);
+
+
+        /* ========================================================================
+         * SECCIÓN 2: LÓGICA DEL REQUERIMIENTO B - MATRIZ 2D ESTÁTICA (4x5)
+         * Estructura de Datos: Arreglo Bidimensional de 4 Filas (Flores) x 5 Columnas (Invernaderos)
+         * ======================================================================== */
+
+        // Definimos las constantes de dimensión fija de la matriz 2D
+        const FILAS_FLORES = 4;
+        const COLUMNAS_INVERNADEROS = 5;
+
+        // Declaramos la estructura de datos Matriz 2D en memoria: un arreglo de 4 filas, cada una con un arreglo de 5 columnas
+        const matrizProduccion = Array.from({ length: FILAS_FLORES }, () => new Array(COLUMNAS_INVERNADEROS).fill(0));
+
+        // Referencias a elementos del DOM de la Sección 2
+        const btnCalcularMatriz = document.getElementById('btn-calcular-matriz');
+        const resultadoProduccionTotal = document.getElementById('resultado-produccion-total');
+        const totalMatrizTabla = document.getElementById('total-matriz-tabla');
+        const detalleCalculoMatriz = document.getElementById('detalle-calculo-matriz');
+
+        /**
+         * Función que sincroniza los inputs HTML con la matriz 2D en memoria
+         * y la recorre mediante dos ciclos 'for' anidados (filas y columnas)
+         * para calcular subtotales y la producción total.
+         */
+        function calcularProduccionTotalMatriz() {
+            // 1. Capturamos todos los inputs de la cuadrícula para poblar la matriz bidimensional en JavaScript
+            const inputsCeldas = document.querySelectorAll('.celda-matriz');
+
+            inputsCeldas.forEach((input) => {
+                // Extraemos las coordenadas [fila][columna] almacenadas en los atributos data-row y data-col
+                const fila = parseInt(input.getAttribute('data-row'), 10);
+                const columna = parseInt(input.getAttribute('data-col'), 10);
+
+                // Convertimos el valor ingresado a número entero; si está vacío o es negativo, asignamos 0
+                let valorNumerico = parseInt(input.value, 10);
+                if (isNaN(valorNumerico) || valorNumerico < 0) {
+                    valorNumerico = 0;
+                    input.value = 0;
+                }
+
+                // Guardamos el valor en la coordenada exacta matrizProduccion[fila][columna]
+                matrizProduccion[fila][columna] = valorNumerico;
+            });
+
+            // 2. Inicializamos acumuladores para el total general y los subtotales por columna
+            let sumaTotalGeneral = 0;
+            const subtotalesPorColumna = new Array(COLUMNAS_INVERNADEROS).fill(0);
+
+            // 3. Recorrido clásico de una Matriz 2D mediante dos bucles 'for' anidados:
+            // El bucle externo recorre el Eje Y (las 4 filas de variedades de flores: i = 0..3)
+            for (let i = 0; i < FILAS_FLORES; i++) {
+                let subtotalFilaActual = 0;
+
+                // El bucle interno recorre el Eje X (los 5 invernaderos de la fila actual: j = 0..4)
+                for (let j = 0; j < COLUMNAS_INVERNADEROS; j++) {
+                    // Accedemos al valor almacenado en la intersección [i][j]
+                    const valorCelda = matrizProduccion[i][j];
+
+                    // Sumamos al acumulador de la fila (flor), de la columna (invernadero) y al gran total
+                    subtotalFilaActual += valorCelda;
+                    subtotalesPorColumna[j] += valorCelda;
+                    sumaTotalGeneral += valorCelda;
+                }
+
+                // Actualizamos en el DOM el subtotal correspondiente a la fila 'i'
+                const celdaSubtotalFila = document.getElementById(`subtotal-fila-${i}`);
+                if (celdaSubtotalFila) {
+                    celdaSubtotalFila.textContent = subtotalFilaActual.toLocaleString('es-CO');
+                }
+            }
+
+            // 4. Actualizamos en el DOM los subtotales de cada columna (invernadero j = 0..4)
+            for (let j = 0; j < COLUMNAS_INVERNADEROS; j++) {
+                const celdaSubtotalCol = document.getElementById(`subtotal-col-${j}`);
+                if (celdaSubtotalCol) {
+                    celdaSubtotalCol.textContent = subtotalesPorColumna[j].toLocaleString('es-CO');
+                }
+            }
+
+            // 5. Mostramos la Producción Total en el banner principal y en la esquina inferior de la tabla
+            const totalFormateado = sumaTotalGeneral.toLocaleString('es-CO');
+            resultadoProduccionTotal.textContent = `${totalFormateado} tallos`;
+            totalMatrizTabla.textContent = totalFormateado;
+            detalleCalculoMatriz.textContent = `Recorrido completado exitosamente: 4 filas × 5 columnas = 20 posiciones leídas en complejidad O(F × C).`;
+        }
+
+        // Evento 'click' en el botón "Calcular Producción Total"
+        btnCalcularMatriz.addEventListener('click', calcularProduccionTotalMatriz);
+
+        // También recalculamos en tiempo real cuando el usuario modifica cualquier celda de la matriz
+        document.querySelectorAll('.celda-matriz').forEach((input) => {
+            input.addEventListener('input', calcularProduccionTotalMatriz);
+        });
+
+
+        /* ========================================================================
+         * SECCIÓN 3: LÓGICA DEL REQUERIMIENTO C - LISTA DINÁMICA (NODOS ENLAZADOS)
+         * Incluye inserción al final, eliminación del último nodo y eliminación
+         * de CUALQUIER nodo intermedio o inicial mediante reconexión de punteros.
+         * ======================================================================== */
+
+        /**
+         * Clase que representa un Nodo individual dentro de la Lista Enlazada.
+         * Cada instancia simula un bloque de memoria asignado dinámicamente en el Heap.
+         */
+        class NodoRecolector {
+            constructor(nombreRecolector, direccionMemoriaSimulada) {
+                // Campo de datos (Payload): almacena el nombre del recolector temporal
+                this.dato = nombreRecolector;
+                // Dirección de memoria hexadecimal simulada (no contigua) para demostrar asignación en Heap
+                this.direccionHeap = direccionMemoriaSimulada;
+                // Puntero o referencia al siguiente nodo de la lista; por defecto inicia apuntando a NULL
+                this.siguiente = null;
+            }
+        }
+
+        /**
+         * Clase que administra la Lista Enlazada Simple a través del puntero 'cabeza' (HEAD).
+         */
+        class ListaEnlazadaRecolectores {
+            constructor() {
+                // El puntero HEAD inicia en null cuando la lista está vacía
+                this.cabeza = null;
+                // Contador de nodos activos actualmente en la estructura
+                this.tamano = 0;
+            }
+
+            /**
+             * Método para insertar un nuevo nodo al final de la lista enlazada.
+             * @param {string} nombre - Nombre del recolector a registrar.
+             */
+            agregarAlFinal(nombre) {
+                // Generamos una dirección de memoria aleatoria en el Heap para evidenciar que NO es contigua
+                const direccionAleatoria = '0x' + Math.floor(0x2000 + Math.random() * 0x7FFF).toString(16).toUpperCase();
+
+                // Instanciamos el nuevo nodo en memoria en tiempo de ejecución
+                const nuevoNodo = new NodoRecolector(nombre, direccionAleatoria);
+
+                // Caso 1: Si la lista está vacía (HEAD === null), el nuevo nodo se convierte en la cabeza (HEAD)
+                if (this.cabeza === null) {
+                    this.cabeza = nuevoNodo;
+                } else {
+                    // Caso 2: Recorremos la lista desde HEAD siguiendo los punteros '.siguiente' hasta llegar al último nodo
+                    let nodoActual = this.cabeza;
+                    while (nodoActual.siguiente !== null) {
+                        nodoActual = nodoActual.siguiente;
+                    }
+                    // Enlazamos el puntero 'siguiente' del último nodo hacia el nuevo nodo recién creado
+                    nodoActual.siguiente = nuevoNodo;
+                }
+
+                // Incrementamos el contador de elementos de la lista dinámica
+                this.tamano++;
+                return nuevoNodo;
+            }
+
+            /**
+             * Método para eliminar el último nodo de la lista enlazada y liberar su referencia.
+             */
+            eliminarUltimo() {
+                if (this.cabeza === null) {
+                    return null;
+                }
+                return this.eliminarPorPosicion(this.tamano - 1);
+            }
+
+            /**
+             * Método para eliminar CUALQUIER nodo de la lista enlazada dada su posición (0 a tamano - 1).
+             * Demuestra cómo una lista enlazada elimina registros intermedios re-enlazando punteros
+             * sin necesidad de desplazar elementos en memoria como ocurriría en un vector.
+             * @param {number} posicion - Índice base 0 del nodo que se desea eliminar.
+             */
+            eliminarPorPosicion(posicion) {
+                // Validamos que la lista no esté vacía y que la posición sea válida
+                if (this.cabeza === null || posicion < 0 || posicion >= this.tamano) {
+                    return null;
+                }
+
+                let nodoEliminado = null;
+
+                // Caso A: Eliminación del primer nodo (HEAD, posición 0)
+                if (posicion === 0) {
+                    nodoEliminado = this.cabeza;
+                    // El puntero HEAD salta directamente al segundo nodo (o a NULL si era el único)
+                    this.cabeza = this.cabeza.siguiente;
+                } else {
+                    // Caso B: Eliminación de un nodo intermedio o final
+                    // Recorremos la lista hasta ubicarnos en el nodo ANTERIOR al que queremos borrar
+                    let nodoAnterior = this.cabeza;
+                    for (let i = 0; i < posicion - 1; i++) {
+                        nodoAnterior = nodoAnterior.siguiente;
+                    }
+
+                    // Identificamos el nodo objetivo a eliminar
+                    nodoEliminado = nodoAnterior.siguiente;
+
+                    // RECONEXIÓN DE PUNTEROS: El puntero 'siguiente' del nodo anterior salta al nodo eliminado
+                    // y se conecta directamente con 'nodoEliminado.siguiente'
+                    nodoAnterior.siguiente = nodoEliminado.siguiente;
+                }
+
+                // Limpiamos la referencia saliente del nodo eliminado para facilitar el Garbage Collection
+                nodoEliminado.siguiente = null;
+                this.tamano--;
+                return nodoEliminado;
+            }
+        }
+
+        // Instanciamos nuestra Lista Enlazada para gestionar los recolectores temporales
+        const listaRecolectores = new ListaEnlazadaRecolectores();
+
+        // Referencias a los elementos del DOM de la Sección 3
+        const inputNombreRecolector = document.getElementById('input-nombre-recolector');
+        const btnAgregarRecolector = document.getElementById('btn-agregar-recolector');
+        const btnEliminarUltimo = document.getElementById('btn-eliminar-ultimo');
+        const contenedorNodosLista = document.getElementById('contenedor-nodos-lista');
+        const spanContadorNodos = document.getElementById('contador-nodos');
+        const spanEstadoHead = document.getElementById('estado-head');
+        const spanMensajeOperacion = document.getElementById('mensaje-operacion-lista');
+
+        /**
+         * Función utilitaria para escapar caracteres especiales HTML y prevenir inyección XSS.
+         */
+        function sanitizarTexto(texto) {
+            const divTemporal = document.createElement('div');
+            divTemporal.textContent = texto;
+            return divTemporal.innerHTML;
+        }
+
+        /**
+         * Función que recorre la Lista Enlazada desde el puntero HEAD hasta NULL
+         * y construye visualmente en el DOM cada caja (nodo) conectada con una flecha '->'.
+         * Incluye en cada nodo un botón '✕' para eliminar ese recolector específico.
+         */
+        function renderizarListaEnlazadaDOM() {
+            // Limpiamos el lienzo visual antes de redibujar la cadena de nodos
+            contenedorNodosLista.innerHTML = '';
+
+            // Actualizamos los contadores de estado en la barra superior
+            spanContadorNodos.textContent = listaRecolectores.tamano;
+            spanEstadoHead.textContent = listaRecolectores.cabeza
+                ? `${listaRecolectores.cabeza.direccionHeap} (${listaRecolectores.cabeza.dato})`
+                : 'NULL';
+
+            // Si la lista está vacía, mostramos el puntero HEAD apuntando directamente a NULL
+            if (listaRecolectores.cabeza === null) {
+                contenedorNodosLista.innerHTML = `
+                    <div class="flex items-center gap-3 text-slate-400 font-mono text-sm py-6">
+                        <span class="px-3 py-1.5 rounded bg-slate-800 border border-slate-600 text-emerald-400 font-bold">HEAD</span>
+                        <span class="text-emerald-400 font-bold text-lg">-&gt;</span>
+                        <span class="px-3 py-1.5 rounded bg-rose-950/80 border border-rose-500/60 text-rose-300 font-bold">NULL (Lista Vacía)</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // Creamos la etiqueta visual de inicio "HEAD ->"
+            const indicadorHead = document.createElement('div');
+            indicadorHead.className = 'flex items-center gap-2 font-mono text-xs';
+            indicadorHead.innerHTML = `
+                <span class="px-2.5 py-1 rounded bg-emerald-600 text-white font-bold shadow">HEAD</span>
+                <span class="text-emerald-400 font-extrabold text-lg">-&gt;</span>
+            `;
+            contenedorNodosLista.appendChild(indicadorHead);
+
+            // Recorremos la lista enlazada nodo por nodo usando un puntero auxiliar 'nodoActual'
+            let nodoActual = listaRecolectores.cabeza;
+            let posicionActual = 0;
+
+            while (nodoActual !== null) {
+                // Determinamos a qué dirección de memoria apunta el puntero 'siguiente' de este nodo
+                const direccionSiguiente = nodoActual.siguiente
+                    ? nodoActual.siguiente.direccionHeap
+                    : 'NULL';
+
+                // Creamos el contenedor visual del nodo junto con su flecha de enlace '->'
+                const elementoNodo = document.createElement('div');
+                elementoNodo.className = 'animate-node flex items-center gap-2 my-1';
+
+                elementoNodo.innerHTML = `
+                    <!-- Caja visual del Nodo (Dividida en Dato, Puntero Siguiente y Botón de Eliminación Directa) -->
+                    <div class="bg-slate-800 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-md flex text-xs font-mono group">
+                        <!-- Sección Izquierda del Nodo: Dato (Nombre del Recolector) -->
+                        <div class="p-2.5 bg-slate-800 text-white">
+                            <div class="flex items-center justify-between gap-2 text-[10px] text-emerald-400 mb-0.5">
+                                <span>Nodo #${posicionActual + 1}</span>
+                                <span>[${nodoActual.direccionHeap}]</span>
+                            </div>
+                            <div class="font-sans font-bold text-sm text-white">
+                                ${sanitizarTexto(nodoActual.dato)}
+                            </div>
+                        </div>
+                        <!-- Sección Central del Nodo: Puntero 'siguiente' (*next) -->
+                        <div class="px-2.5 py-2 bg-emerald-950/90 border-l border-emerald-500/50 flex flex-col justify-center items-center text-[10px] text-emerald-300">
+                            <span class="uppercase text-[9px] text-slate-400">sig*</span>
+                            <span class="font-bold">${direccionSiguiente}</span>
+                        </div>
+                        <!-- Botón para eliminar este nodo específico (sea el primero, intermedio o último) -->
+                        <button
+                            type="button"
+                            data-pos="${posicionActual}"
+                            title="Eliminar este recolector re-enlazando el puntero anterior"
+                            class="btn-eliminar-nodo-especifico px-2 bg-slate-900 hover:bg-rose-600 text-slate-400 hover:text-white border-l border-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Flecha conectora explícita -> exigida por el requerimiento -->
+                    <span class="text-emerald-400 font-mono font-extrabold text-xl px-1 select-none">-&gt;</span>
+                `;
+
+                contenedorNodosLista.appendChild(elementoNodo);
+
+                // Avanzamos el puntero auxiliar al siguiente nodo de la cadena
+                nodoActual = nodoActual.siguiente;
+                posicionActual++;
+            }
+
+            // Al terminar el bucle while (nodoActual === null), agregamos el bloque terminal NULL
+            const bloqueNull = document.createElement('div');
+            bloqueNull.className = 'px-3 py-2 rounded-lg bg-rose-950/80 border border-rose-500/60 text-rose-300 font-mono font-bold text-xs shadow';
+            bloqueNull.textContent = 'NULL';
+            contenedorNodosLista.appendChild(bloqueNull);
+
+            // Asociamos el evento 'click' a cada botón individual '✕' de los nodos renderizados
+            contenedorNodosLista.querySelectorAll('.btn-eliminar-nodo-especifico').forEach((boton) => {
+                boton.addEventListener('click', () => {
+                    const pos = parseInt(boton.getAttribute('data-pos'), 10);
+                    manejarEliminarPorPosicion(pos);
+                });
+            });
+        }
+
+        /**
+         * Manejador para agregar un nuevo recolector desde el input de texto.
+         */
+        function manejarAgregarRecolector() {
+            const nombreLimpio = inputNombreRecolector.value.trim();
+
+            if (nombreLimpio === '') {
+                spanMensajeOperacion.textContent = '⚠ Ingresa el nombre del recolector antes de agregar.';
+                spanMensajeOperacion.className = 'text-amber-600 font-semibold';
+                inputNombreRecolector.focus();
+                return;
+            }
+
+            const nodoCreado = listaRecolectores.agregarAlFinal(nombreLimpio);
+            inputNombreRecolector.value = '';
+            inputNombreRecolector.focus();
+
+            spanMensajeOperacion.textContent = `✔ Nodo "${nodoCreado.dato}" asignado en ${nodoCreado.direccionHeap}`;
+            spanMensajeOperacion.className = 'text-emerald-700 font-semibold';
+
+            renderizarListaEnlazadaDOM();
+        }
+
+        /**
+         * Manejador para eliminar cualquier nodo (inicial, intermedio o último) según su posición.
+         */
+        function manejarEliminarPorPosicion(posicion) {
+            const nodoBorrado = listaRecolectores.eliminarPorPosicion(posicion);
+
+            if (!nodoBorrado) {
+                spanMensajeOperacion.textContent = '⚠ Subdesbordamiento (Underflow): La lista ya está vacía.';
+                spanMensajeOperacion.className = 'text-rose-600 font-semibold';
+                return;
+            }
+
+            spanMensajeOperacion.textContent = `✖ Nodo #${posicion + 1} "${nodoBorrado.dato}" (${nodoBorrado.direccionHeap}) eliminado y punteros re-enlazados.`;
+            spanMensajeOperacion.className = 'text-rose-600 font-semibold';
+
+            renderizarListaEnlazadaDOM();
+        }
+
+        /**
+         * Manejador para eliminar el último recolector de la lista enlazada.
+         */
+        function manejarEliminarUltimoRecolector() {
+            const nodoBorrado = listaRecolectores.eliminarUltimo();
+
+            if (!nodoBorrado) {
+                spanMensajeOperacion.textContent = '⚠ Subdesbordamiento (Underflow): La lista ya está vacía.';
+                spanMensajeOperacion.className = 'text-rose-600 font-semibold';
+                return;
+            }
+
+            spanMensajeOperacion.textContent = `✖ Último nodo "${nodoBorrado.dato}" (${nodoBorrado.direccionHeap}) liberado de memoria.`;
+            spanMensajeOperacion.className = 'text-rose-600 font-semibold';
+
+            renderizarListaEnlazadaDOM();
+        }
+
+        // Asociamos los eventos 'click' a los botones de la Sección 3
+        btnAgregarRecolector.addEventListener('click', manejarAgregarRecolector);
+        btnEliminarUltimo.addEventListener('click', manejarEliminarUltimoRecolector);
+
+        // Permitimos presionar la tecla 'Enter' dentro del input para agregar un recolector rápidamente
+        inputNombreRecolector.addEventListener('keydown', (evento) => {
+            if (evento.key === 'Enter') {
+                evento.preventDefault();
+                manejarAgregarRecolector();
+            }
+        });
+
+
+        /* ========================================================================
+         * SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO IU DIGITAL DE ANTIOQUIA)
+         * Integrantes oficiales:
+         * 1. Jhon Fredy Betancur Davila
+         * 2. Cristian Gutierrez
+         * 3. Jose Fernando Higuita
+         * 4. Arnold Diaz
+         * Al publicar o cargar las respuestas, limpia los campos y oculta el formulario.
+         * ======================================================================== */
+
+        // Referencias a elementos del DOM de la Sección 4
+        const contenedorFormularioEquipo = document.getElementById('contenedor-formulario-equipo');
+        const seccionEvidenciaPublicada = document.getElementById('seccion-evidencia-publicada');
+        const formAutoevaluacion = document.getElementById('form-autoevaluacion');
+        const contenedorTarjetasEquipo = document.getElementById('contenedor-tarjetas-equipo');
+        const estadoPublicacion = document.getElementById('estado-publicacion');
+        const btnAutocompletarEjemplo = document.getElementById('btn-autocompletar-ejemplo');
+        const btnMostrarFormulario = document.getElementById('btn-mostrar-formulario');
+
+        // Roles descriptivos para enriquecer el encabezado de cada tarjeta de estudiante
+        const rolesEquipo = [
+            'Arquitecto de Datos & Memoria',
+            'Líder de Desarrollo Frontend & DOM',
+            'Analista de Complejidad Algorítmica',
+            'Diseñador de Experiencia UX/UI & QA'
+        ];
+
+        /**
+         * Función que recibe un arreglo de 4 objetos de estudiantes, renderiza las
+         * 4 Tarjetas Profesionales (Cards) de evidencia, limpia los inputs en blanco
+         * y oculta el formulario para dejar una presentación limpia.
+         */
+        function renderizarTarjetasYOcultarFormulario(datosEstudiantes) {
+            // Limpiamos el contenedor de tarjetas antes de inyectar las 4 tarjetas definitivas
+            contenedorTarjetasEquipo.innerHTML = '';
+
+            // Recorremos los 4 objetos de estudiantes y construimos cada Card profesional
+            datosEstudiantes.forEach((estudiante) => {
+                // Obtenemos las iniciales del nombre para el avatar visual de la tarjeta
+                const iniciales = estudiante.nombre
+                    .split(' ')
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((palabra) => palabra[0].toUpperCase())
+                    .join('');
+
+                // Creamos el elemento semántico <article> para la tarjeta del estudiante
+                const cardEstudiante = document.createElement('article');
+                cardEstudiante.className = 'animate-node bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden flex flex-col justify-between hover:shadow-lg transition-shadow';
+
+                cardEstudiante.innerHTML = `
+                    <!-- Encabezado de la Tarjeta con el Nombre del Estudiante e Institución -->
+                    <div class="bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
+                                ${sanitizarTexto(iniciales)}
+                            </span>
+                            <div>
+                                <h4 class="text-base font-bold text-white leading-snug">
+                                    ${sanitizarTexto(estudiante.nombre)}
+                                </h4>
+                                <span class="text-xs text-emerald-300 font-mono block">
+                                    ${sanitizarTexto(estudiante.rol)}
+                                </span>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded bg-white/10 text-[11px] font-mono text-emerald-200 shrink-0">
+                            IU Digital #${estudiante.numero}
+                        </span>
+                    </div>
+
+                    <!-- Cuerpo de la Tarjeta con las dos respuestas formateadas elegantemente -->
+                    <div class="p-5 space-y-4 flex-grow bg-white">
+                        <!-- Respuesta 1: Volumen Fijo (Estático) vs Variable (Dinámico) -->
+                        <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-emerald-600">
+                            <h5 class="text-xs font-bold uppercase tracking-wide text-emerald-800 mb-1.5">
+                                1. Importancia de identificar volumen fijo (estático) vs. variable (dinámico)
+                            </h5>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                ${sanitizarTexto(estudiante.respuestaVolumenDatos)}
+                            </p>
+                        </div>
+
+                        <!-- Respuesta 2: Diversidad de Habilidades en el Equipo -->
+                        <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-slate-600">
+                            <h5 class="text-xs font-bold uppercase tracking-wide text-slate-800 mb-1.5">
+                                2. Aporte de la diversidad de habilidades del grupo a la propuesta
+                            </h5>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                ${sanitizarTexto(estudiante.respuestaDiversidadGrupo)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pie de la Tarjeta de Evidencia -->
+                    <div class="px-5 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                        <span>IU Digital de Antioquia — Evidencia de Consultoría</span>
+                        <span class="text-emerald-700 font-semibold">✔ Verificado</span>
+                    </div>
+                `;
+
+                // Agregamos la tarjeta terminada al contenedor en pantalla
+                contenedorTarjetasEquipo.appendChild(cardEstudiante);
+            });
+
+            // 1. Dejamos todos los campos del formulario en blanco (.reset())
+            formAutoevaluacion.reset();
+
+            // 2. Ocultamos el contenedor del formulario y mostramos la sección de tarjetas publicadas
+            contenedorFormularioEquipo.classList.add('hidden');
+            seccionEvidenciaPublicada.classList.remove('hidden');
+
+            // 3. Mostramos el botón "Mostrar Formulario vacío" por si desean volver al formulario limpio sin tarjetas
+            btnMostrarFormulario.classList.remove('hidden');
+
+            // 4. Actualizamos la insignia de estado de publicación
+            estadoPublicacion.textContent = '✔ 4 Conclusiones Publicadas (Formulario Oculto)';
+            estadoPublicacion.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800';
+        }
+
+        /**
+         * Función que captura las entradas manuales de los 4 estudiantes en el formulario
+         * y publica las tarjetas.
+         */
+        function publicarConclusionesEquipo(evento) {
+            if (evento) evento.preventDefault();
+
+            const datosEstudiantes = [];
+
+            for (let i = 1; i <= 4; i++) {
+                const inputNombre = document.getElementById(`nombre-est-${i}`);
+                const textareaResp1 = document.getElementById(`resp1-est-${i}`);
+                const textareaResp2 = document.getElementById(`resp2-est-${i}`);
+
+                const nombre = inputNombre.value.trim();
+                const respuesta1 = textareaResp1.value.trim();
+                const respuesta2 = textareaResp2.value.trim();
+
+                if (!nombre || !respuesta1 || !respuesta2) {
+                    alert(`Por favor completa todos los campos del Integrante #${i} antes de publicar (o usa el botón "Cargar Respuestas del Equipo").`);
+                    inputNombre.focus();
+                    return;
+                }
+
+                datosEstudiantes.push({
+                    numero: i,
+                    rol: rolesEquipo[i - 1],
+                    nombre: nombre,
+                    respuestaVolumenDatos: respuesta1,
+                    respuestaDiversidadGrupo: respuesta2
+                });
+            }
+
+            renderizarTarjetasYOcultarFormulario(datosEstudiantes);
+        }
+
+        /**
+         * Función que publica directamente las conclusiones de los 4 integrantes oficiales
+         * del equipo de la IU Digital de Antioquia, dejando los campos del formulario
+         * en blanco y ocultándolos.
+         */
+        function cargarRespuestasDeEjemplo() {
+            const conclusionesEquipoIUDigital = [
+                {
+                    numero: 1,
+                    rol: rolesEquipo[0],
+                    nombre: 'Jhon Fredy Betancur Davila',
+                    respuestaVolumenDatos: 'Determinar la naturaleza del volumen de datos antes de codificar evita dos fallos críticos de arquitectura: el desbordamiento de memoria (cuando usamos estructuras fijas para datos impredecibles) y el desperdicio de RAM por punteros innecesarios (cuando usamos estructuras dinámicas para datos constantes como los 30 días del mes).',
+                    respuestaDiversidadGrupo: 'Nuestra combinación de pensamiento analítico para el modelado de memoria y sensibilidad visual para el diseño de interfaces nos permitió traducir conceptos abstractos como punteros y matrices en un panel intuitivo para los floricultores.'
+                },
+                {
+                    numero: 2,
+                    rol: rolesEquipo[1],
+                    nombre: 'Cristian Gutierrez',
+                    respuestaVolumenDatos: 'Porque define directamente la complejidad algorítmica O(1) vs O(n) y el uso de la memoria Stack o Heap. En sensores climáticos de frecuencia fija, el vector estático ofrece velocidad insuperable; en contratación temporal, la lista enlazada brinda elasticidad total.',
+                    respuestaDiversidadGrupo: 'Mientras algunos integrantes estructuraron las clases de nodos y el recorrido matricial en JavaScript, otros diseñaron la experiencia de usuario con Tailwind CSS y documentaron línea por línea el código como material pedagógico.'
+                },
+                {
+                    numero: 3,
+                    rol: rolesEquipo[2],
+                    nombre: 'Jose Fernando Higuita',
+                    respuestaVolumenDatos: 'Identificar si el dominio del problema es estático o dinámico garantiza escalabilidad financiera y técnica. Una mala elección inicial obliga a refactorizar toda la capa de persistencia y procesamiento cuando el cultivo crece en temporada alta.',
+                    respuestaDiversidadGrupo: 'El debate técnico entre quienes preferían arreglos tradicionales y quienes defendían nodos enlazados enriqueció la justificación arquitectónica de cada ficha técnica, logrando una consultoría sólida y bien argumentada.'
+                },
+                {
+                    numero: 4,
+                    rol: rolesEquipo[3],
+                    nombre: 'Arnold Diaz',
+                    respuestaVolumenDatos: 'Permite al ingeniero de software anticipar cómo se comportará la aplicación en producción bajo carga real, seleccionando matrices contiguas cuando se requiere cruce rápido de coordenadas o listas dinámicas cuando prima la flexibilidad.',
+                    respuestaDiversidadGrupo: 'La división modular del trabajo en nuestro equipo de la IU Digital de Antioquia (estructura semántica HTML5, lógica algorítmica en Vanilla JS, diseño responsive y pruebas de calidad) hizo posible entregar un producto cohesivo y libre de errores.'
+                }
+            ];
+
+            // Renderizamos las 4 tarjetas profesionales, limpiamos los campos en blanco y ocultamos el formulario
+            renderizarTarjetasYOcultarFormulario(conclusionesEquipoIUDigital);
+        }
+
+        // Evento para volver a mostrar el formulario en blanco y ocultar/limpiar las tarjetas publicadas
+        btnMostrarFormulario.addEventListener('click', () => {
+            // 1. Limpiamos todos los campos del formulario
+            formAutoevaluacion.reset();
+            // 2. Vaciamos las tarjetas generadas y ocultamos el bloque de evidencia publicada
+            contenedorTarjetasEquipo.innerHTML = '';
+            seccionEvidenciaPublicada.classList.add('hidden');
+            // 3. Mostramos nuevamente el formulario vacío y ocultamos este botón
+            contenedorFormularioEquipo.classList.remove('hidden');
+            btnMostrarFormulario.classList.add('hidden');
+        });
+
+        // Escuchador del evento 'submit' del formulario para el botón "Publicar Conclusiones del Equipo"
+        formAutoevaluacion.addEventListener('submit', publicarConclusionesEquipo);
+
+        // Escuchador del botón para cargar las respuestas oficiales del equipo y ocultar los campos
+        btnAutocompletarEjemplo.addEventListener('click', cargarRespuestasDeEjemplo);
+
+
+        /* ========================================================================
+         * INICIALIZACIÓN AUTOMÁTICA DEL DASHBOARD AL CARGAR EL DOM
+         * ======================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Configuramos los diagramas técnicos y el modal de zoom al hacer clic
+            configurarDiagramasYZoom();
+
+            // 2. Calculamos el estado inicial de la Matriz 4x5 con los valores por defecto
+            calcularProduccionTotalMatriz();
+
+            // 3. Cargamos 3 recolectores iniciales de demostración en la Lista Enlazada
+            listaRecolectores.agregarAlFinal('Mateo Quiroga (Invernadero Norte)');
+            listaRecolectores.agregarAlFinal('Lucía Fernández (Corte Especial)');
+            listaRecolectores.agregarAlFinal('Carlos Restrepo (Clasificación)');
+            renderizarListaEnlazadaDOM();
+        });
+    </script>
+</body>
+</html>
