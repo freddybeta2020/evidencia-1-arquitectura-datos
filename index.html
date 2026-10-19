@@ -24,6 +24,9 @@
     <!-- Favicon vectorial personalizado acorde a la temática (Floricultura + Nodos de Datos) -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+    <!-- Hoja de estilos Tailwind pre-compilada localmente (Garantiza diseño 100% idéntico en móviles aunque el operador/navegador bloquee CDNs externos) -->
+    <link rel="stylesheet" href="styles.css">
+
     <!-- Importación de Tailwind CSS vía CDN oficial para estilizado moderno tipo Dashboard -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -50,8 +53,22 @@
         };
     </script>
 
-    <!-- Estilos CSS adicionales para animaciones suaves de nodos y controles numéricos compactos -->
+    <!-- Estilos CSS adicionales para animaciones suaves, blindaje responsive en móviles y controles numéricos -->
     <style>
+        /* Blindaje nativo para evitar desbordamiento de imágenes o contenedores en pantallas móviles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        img, svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+        }
+
         /* Animación de entrada para cuando se renderizan tarjetas o nodos dinámicos en el DOM */
         @keyframes fadeInScale {
             from {
@@ -360,7 +377,7 @@
                             <img
                                 src="imagen1.jpg"
                                 alt="Diagrama Vector"
-                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                                class="diagrama-ampliable w-full max-w-full rounded shadow-md h-auto max-h-[200px] sm:max-h-[250px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
                             >
                         </div>
                     </div>
@@ -557,7 +574,7 @@
                             <img
                                 src="imagen2.jpg"
                                 alt="Diagrama Matriz"
-                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                                class="diagrama-ampliable w-full max-w-full rounded shadow-md h-auto max-h-[200px] sm:max-h-[250px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
                             >
                         </div>
                     </div>
@@ -691,7 +708,7 @@
                             <img
                                 src="imagen3.jpg"
                                 alt="Diagrama Lista Dinámica"
-                                class="diagrama-ampliable w-full rounded shadow-md min-h-[210px] sm:min-h-[240px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
+                                class="diagrama-ampliable w-full max-w-full rounded shadow-md h-auto max-h-[200px] sm:max-h-[250px] object-contain bg-slate-900 p-1 cursor-zoom-in hover:ring-2 hover:ring-emerald-500 transition-all"
                             >
                         </div>
                     </div>
