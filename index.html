@@ -66,8 +66,12 @@
         }
         html, body {
             max-width: 100%;
-            overflow-x: hidden;
+            overflow-x: clip;
             forced-color-adjust: none;
+        }
+        /* Margen superior de desplazamiento para que la barra fija (<nav>) nunca tape el título de las secciones */
+        section[id] {
+            scroll-margin-top: 5.5rem;
         }
         img, svg {
             max-width: 100% !important;
@@ -147,35 +151,35 @@
          Identidad de la IU Digital de Antioquia y accesos rápidos a las 4 secciones
          ========================================================================== -->
     <nav class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-emerald-500/30 text-slate-100 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between py-2 sm:py-3 gap-2 sm:gap-3">
                 <!-- Identidad institucional: IU Digital de Antioquia -->
-                <div class="flex items-center gap-3">
-                    <span class="inline-flex items-center justify-center px-2.5 h-9 rounded-lg bg-emerald-600 text-white font-extrabold text-xs tracking-wider shadow-inner">
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <span class="inline-flex items-center justify-center px-2 sm:px-2.5 h-8 sm:h-9 rounded-lg bg-emerald-600 text-white font-extrabold text-xs tracking-wider shadow-inner">
                         IUD
                     </span>
                     <div>
-                        <span class="text-[11px] uppercase tracking-widest text-emerald-400 font-bold block">
+                        <span class="text-[10px] sm:text-[11px] uppercase tracking-widest text-emerald-400 font-bold block leading-tight">
                             IU Digital de Antioquia
                         </span>
-                        <span class="text-xs sm:text-sm font-bold text-white">
+                        <span class="text-xs sm:text-sm font-bold text-white leading-tight block">
                             Arquitectura de Datos — Asociación Floricultores
                         </span>
                     </div>
                 </div>
 
                 <!-- Enlaces de navegación rápida a cada sección semántica -->
-                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium">
-                    <a href="#req-a" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                <div class="flex flex-wrap items-center gap-1 sm:gap-2 text-[11px] sm:text-sm font-medium">
+                    <a href="#req-a" class="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
                         Req. A: Vector (1D)
                     </a>
-                    <a href="#req-b" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                    <a href="#req-b" class="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
                         Req. B: Matriz (2D)
                     </a>
-                    <a href="#req-c" class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
+                    <a href="#req-c" class="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md bg-slate-800 hover:bg-emerald-600 hover:text-white transition-colors">
                         Req. C: Lista Dinámica
                     </a>
-                    <a href="#autoevaluacion" class="px-2.5 py-1.5 rounded-md bg-emerald-700 text-white hover:bg-emerald-500 transition-colors">
+                    <a href="#autoevaluacion" class="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md bg-emerald-700 text-white hover:bg-emerald-500 transition-colors">
                         Autoevaluación (Equipo)
                     </a>
                 </div>
