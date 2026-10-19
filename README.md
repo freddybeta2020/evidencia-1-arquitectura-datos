@@ -8,9 +8,9 @@ Propuesta de consultoría tecnológica e interactiva (Single Page Application) s
 
 ## 👥 Equipo Consultor
 1. **Jhon Fredy Betancur Davila** — *Arquitecto de Datos & Memoria*
-2. **Cristian Gutierrez** — *Líder de Desarrollo Frontend & DOM*
+2. **Cristian David Gutierrez Olivar** — *Líder de Desarrollo Frontend & DOM*
 3. **Jose Fernando Higuita** — *Analista de Complejidad Algorítmica*
-4. **Arnold Diaz** — *Diseñador de Experiencia UX/UI & QA*
+4. **Arnold Orlando Barbosa Díaz** — *Diseñador de Experiencia UX/UI & QA*
 
 ---
 

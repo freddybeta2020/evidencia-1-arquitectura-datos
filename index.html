@@ -4,9 +4,9 @@
      Institución: Institución Universitaria Digital de Antioquia (IU Digital de Antioquia)
      Equipo Consultor:
        1. Jhon Fredy Betancur Davila
-       2. Cristian Gutierrez
+       2. Cristian David Gutierrez Olivar
        3. Jose Fernando Higuita
-       4. Arnold Diaz
+       4. Arnold Orlando Barbosa Díaz
      Tipo de Aplicación: Single Page Application (SPA) - Dashboard Interactivo
      Tecnologías: HTML5 Semántico, Tailwind CSS (CDN), Vanilla JavaScript (ES6+)
      Propósito Académico: Material de estudio exhaustivamente comentado sobre
@@ -19,6 +19,8 @@
     <meta charset="UTF-8">
     <!-- Configuración del viewport para garantizar diseño completamente Responsive (móviles, tablets y escritorio) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Evita que Microsoft Edge o navegadores móviles inviertan automáticamente los colores o eliminen fondos oscuros -->
+    <meta name="color-scheme" content="light only">
     <!-- Título de la pestaña del navegador -->
     <title>Dashboard de Arquitectura de Datos - IU Digital de Antioquia</title>
     <!-- Favicon vectorial personalizado acorde a la temática (Floricultura + Nodos de Datos) -->
@@ -53,20 +55,62 @@
         };
     </script>
 
-    <!-- Estilos CSS adicionales para animaciones suaves, blindaje responsive en móviles y controles numéricos -->
+    <!-- Estilos CSS adicionales para animaciones suaves, blindaje responsive en móviles, soporte en Microsoft Edge y controles numéricos -->
     <style>
         /* Blindaje nativo para evitar desbordamiento de imágenes o contenedores en pantallas móviles */
         *, *::before, *::after {
             box-sizing: border-box;
         }
+        :root {
+            color-scheme: light only;
+        }
         html, body {
             max-width: 100%;
             overflow-x: hidden;
+            forced-color-adjust: none;
         }
         img, svg {
             max-width: 100% !important;
             height: auto !important;
             display: block;
+        }
+
+        /* Blindaje de fondo sólido + degradado para el Hero en Microsoft Edge y navegadores móviles */
+        .hero-principal {
+            background-color: #0f172a !important;
+            background-image: linear-gradient(135deg, #0f172a 0%, #022c22 50%, #0f172a 100%) !important;
+            color: #ffffff !important;
+        }
+
+        /* Blindaje de alto contraste para las tarjetas dinámicas de temperatura (Óptimo, Frío, Cálido) */
+        .clima-optimo {
+            border-color: rgba(16, 185, 129, 0.7) !important;
+            background-color: rgba(2, 44, 34, 0.85) !important;
+            color: #6ee7b7 !important;
+        }
+        .clima-frio {
+            border-color: rgba(56, 189, 248, 0.75) !important;
+            background-color: rgba(8, 47, 73, 0.9) !important;
+            color: #7dd3fc !important;
+        }
+        .clima-calido {
+            border-color: rgba(251, 191, 36, 0.75) !important;
+            background-color: rgba(69, 26, 3, 0.9) !important;
+            color: #fcd34d !important;
+        }
+
+        /* Blindaje de alto contraste para los encabezados y avatares de las tarjetas de la Sección 4 */
+        .header-card-estudiante {
+            background-color: #0f172a !important;
+            background-image: linear-gradient(90deg, #0f172a 0%, #064e3b 100%) !important;
+            color: #ffffff !important;
+        }
+        .avatar-estudiante {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background-color: #10b981 !important;
+            color: #020617 !important;
         }
 
         /* Animación de entrada para cuando se renderizan tarjetas o nodos dinámicos en el DOM */
@@ -143,7 +187,7 @@
          ENCABEZADO PRINCIPAL (HERO SECTION)
          Presenta el título oficial, la institución y los 4 integrantes del equipo
          ========================================================================== -->
-    <header class="bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white border-b-4 border-emerald-500 shadow-xl">
+    <header class="hero-principal bg-slate-900 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white border-b-4 border-emerald-500 shadow-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-12 space-y-8">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div class="max-w-3xl">
@@ -199,7 +243,7 @@
                     <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
                         <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">JB</span>
                         <div class="min-w-0">
-                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Jhon Fredy Betancur Davila</span>
+                            <span class="text-xs sm:text-sm font-bold text-white block leading-snug">Jhon Fredy Betancur Davila</span>
                             <span class="text-[11px] text-emerald-400 block">Arquitecto de Datos &amp; Memoria</span>
                         </div>
                     </div>
@@ -207,7 +251,7 @@
                     <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
                         <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">CG</span>
                         <div class="min-w-0">
-                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Cristian Gutierrez</span>
+                            <span class="text-xs sm:text-sm font-bold text-white block leading-snug">Cristian David Gutierrez Olivar</span>
                             <span class="text-[11px] text-emerald-400 block">Líder Frontend &amp; DOM</span>
                         </div>
                     </div>
@@ -215,15 +259,15 @@
                     <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
                         <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">JH</span>
                         <div class="min-w-0">
-                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Jose Fernando Higuita</span>
+                            <span class="text-xs sm:text-sm font-bold text-white block leading-snug">Jose Fernando Higuita</span>
                             <span class="text-[11px] text-emerald-400 block">Analista de Algoritmos</span>
                         </div>
                     </div>
                     <!-- Integrante 4 -->
                     <div class="flex items-center gap-3 bg-slate-800/70 px-3.5 py-2.5 rounded-lg border border-slate-700/80">
-                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">AD</span>
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">AB</span>
                         <div class="min-w-0">
-                            <span class="text-xs sm:text-sm font-bold text-white block truncate">Arnold Diaz</span>
+                            <span class="text-xs sm:text-sm font-bold text-white block leading-snug">Arnold Orlando Barbosa Díaz</span>
                             <span class="text-[11px] text-emerald-400 block">Diseñador UX/UI &amp; QA</span>
                         </div>
                     </div>
@@ -718,8 +762,8 @@
 
         <!-- ======================================================================
              SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO DE 4 ESTUDIANTES)
-             Integrantes: Jhon Fredy Betancur Davila, Cristian Gutierrez,
-             Jose Fernando Higuita y Arnold Diaz.
+             Integrantes: Jhon Fredy Betancur Davila, Cristian David Gutierrez Olivar,
+             Jose Fernando Higuita y Arnold Orlando Barbosa Díaz.
              ====================================================================== -->
         <section id="autoevaluacion" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
             <!-- Encabezado de la Sección 4 -->
@@ -825,7 +869,7 @@
                                     <input
                                         id="nombre-est-2"
                                         type="text"
-                                        placeholder="Ej. Cristian Gutierrez"
+                                        placeholder="Ej. Cristian David Gutierrez Olivar"
                                         class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                                         required
                                     >
@@ -919,7 +963,7 @@
                                     <input
                                         id="nombre-est-4"
                                         type="text"
-                                        placeholder="Ej. Arnold Diaz"
+                                        placeholder="Ej. Arnold Orlando Barbosa Díaz"
                                         class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                                         required
                                     >
@@ -1025,7 +1069,7 @@
                     Institución Universitaria Digital de Antioquia (IU Digital de Antioquia)
                 </p>
                 <p>
-                    Equipo Consultor: <strong class="text-emerald-400">Jhon Fredy Betancur Davila</strong> • <strong class="text-emerald-400">Cristian Gutierrez</strong> • <strong class="text-emerald-400">Jose Fernando Higuita</strong> • <strong class="text-emerald-400">Arnold Diaz</strong>
+                    Equipo Consultor: <strong class="text-emerald-400">Jhon Fredy Betancur Davila</strong> • <strong class="text-emerald-400">Cristian David Gutierrez Olivar</strong> • <strong class="text-emerald-400">Jose Fernando Higuita</strong> • <strong class="text-emerald-400">Arnold Orlando Barbosa Díaz</strong>
                 </p>
             </div>
             <p class="font-mono text-emerald-400 bg-slate-800 px-3 py-1.5 rounded border border-slate-700">
@@ -1257,13 +1301,13 @@
                 const direccionMemoriaHex = '0x' + (0x1000 + (i * 4)).toString(16).toUpperCase();
 
                 // Determinamos el estilo visual según el rango térmico para las flores
-                let colorBorde = 'border-emerald-500/60 bg-emerald-950/60 text-emerald-300';
+                let colorBorde = 'clima-optimo border-emerald-500/60 bg-emerald-950/60 text-emerald-300';
                 let etiquetaClima = 'Óptimo';
                 if (temperaturaAleatoria < 15.0) {
-                    colorBorde = 'border-sky-500/60 bg-sky-950/60 text-sky-300';
+                    colorBorde = 'clima-frio border-sky-500/60 bg-sky-950/60 text-sky-300';
                     etiquetaClima = 'Frío';
                 } else if (temperaturaAleatoria > 23.0) {
-                    colorBorde = 'border-amber-500/60 bg-amber-950/60 text-amber-300';
+                    colorBorde = 'clima-calido border-amber-500/60 bg-amber-950/60 text-amber-300';
                     etiquetaClima = 'Cálido';
                 }
 
@@ -1274,7 +1318,7 @@
 
                 // Inyectamos la estructura interna de la tarjeta con el índice [i], el día y la temperatura
                 tarjetaDia.innerHTML = `
-                    <div class="flex items-center justify-between text-[10px] font-mono opacity-80">
+                    <div class="flex items-center justify-between text-[10px] font-mono">
                         <span class="font-bold">[${i}]</span>
                         <span>${direccionMemoriaHex}</span>
                     </div>
@@ -1282,7 +1326,7 @@
                         <span class="text-xs text-slate-300 block">Día ${i + 1}</span>
                         <span class="text-base font-extrabold font-mono text-white">${vectorTemperaturas[i].toFixed(1)}°C</span>
                     </div>
-                    <div class="text-[10px] text-center uppercase tracking-wider font-semibold opacity-90 border-t border-white/10 pt-1">
+                    <div class="text-[10px] text-center uppercase tracking-wider font-semibold border-t border-white/15 pt-1">
                         ${etiquetaClima}
                     </div>
                 `;
@@ -1739,9 +1783,9 @@
          * SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO IU DIGITAL DE ANTIOQUIA)
          * Integrantes oficiales:
          * 1. Jhon Fredy Betancur Davila
-         * 2. Cristian Gutierrez
+         * 2. Cristian David Gutierrez Olivar
          * 3. Jose Fernando Higuita
-         * 4. Arnold Diaz
+         * 4. Arnold Orlando Barbosa Díaz
          * Al publicar o cargar las respuestas, limpia los campos y oculta el formulario.
          * ======================================================================== */
 
@@ -1787,9 +1831,9 @@
 
                 cardEstudiante.innerHTML = `
                     <!-- Encabezado de la Tarjeta con el Nombre del Estudiante e Institución -->
-                    <div class="bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
+                    <div class="header-card-estudiante bg-slate-900 bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <span class="w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
+                            <span class="avatar-estudiante w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
                                 ${sanitizarTexto(iniciales)}
                             </span>
                             <div>
@@ -1908,7 +1952,7 @@
                 {
                     numero: 2,
                     rol: rolesEquipo[1],
-                    nombre: 'Cristian Gutierrez',
+                    nombre: 'Cristian David Gutierrez Olivar',
                     respuestaVolumenDatos: 'Porque define directamente la complejidad algorítmica O(1) vs O(n) y el uso de la memoria Stack o Heap. En sensores climáticos de frecuencia fija, el vector estático ofrece velocidad insuperable; en contratación temporal, la lista enlazada brinda elasticidad total.',
                     respuestaDiversidadGrupo: 'Mientras algunos integrantes estructuraron las clases de nodos y el recorrido matricial en JavaScript, otros diseñaron la experiencia de usuario con Tailwind CSS y documentaron línea por línea el código como material pedagógico.'
                 },
@@ -1922,7 +1966,7 @@
                 {
                     numero: 4,
                     rol: rolesEquipo[3],
-                    nombre: 'Arnold Diaz',
+                    nombre: 'Arnold Orlando Barbosa Díaz',
                     respuestaVolumenDatos: 'Permite al ingeniero de software anticipar cómo se comportará la aplicación en producción bajo carga real, seleccionando matrices contiguas cuando se requiere cruce rápido de coordenadas o listas dinámicas cuando prima la flexibilidad.',
                     respuestaDiversidadGrupo: 'La división modular del trabajo en nuestro equipo de la IU Digital de Antioquia (estructura semántica HTML5, lógica algorítmica en Vanilla JS, diseño responsive y pruebas de calidad) hizo posible entregar un producto cohesivo y libre de errores.'
                 }
