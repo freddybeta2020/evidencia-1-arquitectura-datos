@@ -24,16 +24,19 @@ module.exports = async function handler(req, res) {
     try {
       const resp = await fetch(STORAGE_ENDPOINT);
       if (!resp.ok) {
-        throw new Error(`Respuesta HTTP ${resp.status} del almacenamiento central`);
+        return res.status(200).json({
+          entregas: {},
+          errorStatus: resp.status,
+          errorText: await resp.text().catch(() => '')
+        });
       }
       const data = await resp.json();
       return res.status(200).json(data || { entregas: {} });
     } catch (err) {
-      console.error('Error al consultar entregas:', err);
       return res.status(200).json({
-        proyecto: 'IU Digital de Antioquia - Evidencia 1 Estructura de Datos',
         entregas: {},
-        warning: 'Caché fallback activa'
+        errorMessage: err.message,
+        errorStack: err.stack
       });
     }
   }
