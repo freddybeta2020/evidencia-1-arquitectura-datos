@@ -766,274 +766,112 @@
 
         <!-- ======================================================================
              SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO DE 4 ESTUDIANTES)
-             Integrantes: Jhon Fredy Betancur Davila, Cristian David Gutierrez Olivar,
-             Jose Fernando Higuita Benitez y Arnold Orlando Barbosa Díaz.
+             Integrantes con nombres fijos e individuales:
+             1. Jhon Fredy Betancur Davila
+             2. Cristian David Gutierrez Olivar
+             3. Jose Fernando Higuita Benitez
+             4. Arnold Orlando Barbosa Díaz
+             Cada integrante sube su aporte en su propio espacio y, una vez enviado,
+             queda bloqueado permanentemente sin edición para entrega al docente.
              ====================================================================== -->
         <section id="autoevaluacion" class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <!-- Encabezado de la Sección 4 -->
+            <!-- Encabezado de la Sección 4 (Sin botón de autocompletar; con indicador oficial de entregas bloqueadas) -->
             <div class="bg-slate-800 text-white px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
                     <span class="px-3 py-1 rounded-md bg-emerald-600 text-xs font-bold uppercase tracking-wider shrink-0 whitespace-nowrap">Sección 4</span>
                     <h2 class="text-lg sm:text-xl font-bold">Autoevaluación y Consultoría (Equipo IU Digital de Antioquia)</h2>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <!-- Botón para alternar la visibilidad del formulario cuando ya fue publicado/ocultado -->
-                    <button
-                        id="btn-mostrar-formulario"
-                        type="button"
-                        class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-md border border-slate-500 transition-colors cursor-pointer"
+                    <!-- Indicador de progreso de entregas bloqueadas (0/4 a 4/4) -->
+                    <span
+                        id="progreso-entregas-equipo"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-md bg-slate-900 text-emerald-400 border border-slate-700 font-mono"
                     >
-                        Mostrar Formulario vacio
-                    </button>
+                        🔒 Entregas registradas: 0 / 4
+                    </span>
 
-                    <!-- Botón rápido para publicar las conclusiones oficiales de los 4 integrantes y ocultar los campos -->
+                    <!-- Botón para copiar el enlace directo con las respuestas bloqueadas para entregar al profesor -->
                     <button
-                        id="btn-autocompletar-ejemplo"
+                        id="btn-copiar-enlace-entrega"
                         type="button"
-                        class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-3.5 py-1.5 rounded-md border border-emerald-500 transition-colors cursor-pointer"
+                        class="hidden text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3.5 py-1.5 rounded-md shadow-sm transition-colors cursor-pointer"
+                        title="Copia el enlace con todas las respuestas bloqueadas incluidas para enviarlo al docente"
                     >
-                        Cargar Respuestas del Equipo
+                        📋 Copiar Enlace para el Profesor
                     </button>
                 </div>
             </div>
 
-            <div class="p-4 sm:p-6 space-y-8">
-                <!-- Contenedor colapsable del formulario: se limpia y se oculta al publicar las conclusiones -->
-                <div id="contenedor-formulario-equipo" class="space-y-6">
+            <div class="p-4 sm:p-6 space-y-6">
+                <!-- Instrucciones claras sobre el envío individual y el bloqueo permanente -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <div class="max-w-3xl">
-                        <h3 class="text-lg font-bold text-slate-800">Formulario Modular de Reflexión Técnica y Trabajo Colaborativo</h3>
-                        <p class="text-sm text-slate-600 mt-1">
-                            Registra los aportes de los 4 integrantes o presiona <strong>"Cargar Respuestas del Equipo"</strong>. Al publicar las conclusiones, los campos del formulario se limpian y se ocultan automáticamente para destacar las tarjetas de evidencia final.
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800">
+                            Registro Individual de Conclusiones por Integrante (Modo Entrega Docente)
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                            Cada integrante tiene su propio módulo con su <strong>nombre oficial fijo</strong>. Al completar las dos preguntas y confirmar con su botón individual <strong>"Subir y Bloquear Respuesta"</strong>, el espacio quedará <strong>bloqueado permanentemente en modo solo lectura</strong> (sin opción de editar ni borrar) para garantizar la transparencia en la calificación del profesor.
                         </p>
                     </div>
-
-                    <!-- Formulario Modular para los 4 Estudiantes -->
-                    <form id="form-autoevaluacion" class="space-y-6" novalidate>
-                        <!-- Grid 2x2 en pantallas medianas/grandes para los 4 módulos de estudiantes -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            <!-- ==================== MÓDULO ESTUDIANTE 1 ==================== -->
-                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #1</span>
-                                    <span class="text-xs text-slate-500 font-mono">Rol: Arquitecto de Datos</span>
-                                </div>
-
-                                <div>
-                                    <label for="nombre-est-1" class="block text-xs font-bold uppercase text-slate-700 mb-1">
-                                        Nombre del Estudiante
-                                    </label>
-                                    <input
-                                        id="nombre-est-1"
-                                        type="text"
-                                        placeholder="Ej. Jhon Fredy Betancur Davila"
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="resp1-est-1" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
-                                    </label>
-                                    <textarea
-                                        id="resp1-est-1"
-                                        rows="3"
-                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label for="resp2-est-1" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
-                                    </label>
-                                    <textarea
-                                        id="resp2-est-1"
-                                        rows="3"
-                                        placeholder="Describe el aporte colaborativo del equipo..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                            <!-- ==================== MÓDULO ESTUDIANTE 2 ==================== -->
-                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #2</span>
-                                    <span class="text-xs text-slate-500 font-mono">Rol: Líder Frontend &amp; DOM</span>
-                                </div>
-
-                                <div>
-                                    <label for="nombre-est-2" class="block text-xs font-bold uppercase text-slate-700 mb-1">
-                                        Nombre del Estudiante
-                                    </label>
-                                    <input
-                                        id="nombre-est-2"
-                                        type="text"
-                                        placeholder="Ej. Cristian David Gutierrez Olivar"
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="resp1-est-2" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
-                                    </label>
-                                    <textarea
-                                        id="resp1-est-2"
-                                        rows="3"
-                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label for="resp2-est-2" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
-                                    </label>
-                                    <textarea
-                                        id="resp2-est-2"
-                                        rows="3"
-                                        placeholder="Describe el aporte colaborativo del equipo..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                            <!-- ==================== MÓDULO ESTUDIANTE 3 ==================== -->
-                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #3</span>
-                                    <span class="text-xs text-slate-500 font-mono">Rol: Analista de Algoritmos</span>
-                                </div>
-
-                                <div>
-                                    <label for="nombre-est-3" class="block text-xs font-bold uppercase text-slate-700 mb-1">
-                                        Nombre del Estudiante
-                                    </label>
-                                    <input
-                                        id="nombre-est-3"
-                                        type="text"
-                                        placeholder="Ej. Jose Fernando Higuita Benitez"
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="resp1-est-3" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
-                                    </label>
-                                    <textarea
-                                        id="resp1-est-3"
-                                        rows="3"
-                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label for="resp2-est-3" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
-                                    </label>
-                                    <textarea
-                                        id="resp2-est-3"
-                                        rows="3"
-                                        placeholder="Describe el aporte colaborativo del equipo..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                            <!-- ==================== MÓDULO ESTUDIANTE 4 ==================== -->
-                            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                    <span class="text-sm font-bold text-emerald-800 uppercase tracking-wider">Integrante #4</span>
-                                    <span class="text-xs text-slate-500 font-mono">Rol: Diseñador UX/UI &amp; QA</span>
-                                </div>
-
-                                <div>
-                                    <label for="nombre-est-4" class="block text-xs font-bold uppercase text-slate-700 mb-1">
-                                        Nombre del Estudiante
-                                    </label>
-                                    <input
-                                        id="nombre-est-4"
-                                        type="text"
-                                        placeholder="Ej. Arnold Orlando Barbosa Díaz"
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="resp1-est-4" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
-                                    </label>
-                                    <textarea
-                                        id="resp1-est-4"
-                                        rows="3"
-                                        placeholder="Escribe tu análisis técnico sobre memoria y rendimiento..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label for="resp2-est-4" class="block text-xs font-semibold text-slate-700 mb-1">
-                                        ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
-                                    </label>
-                                    <textarea
-                                        id="resp2-est-4"
-                                        rows="3"
-                                        placeholder="Describe el aporte colaborativo del equipo..."
-                                        class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-                                        required
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Botón Central requerido: "Publicar Conclusiones del Equipo" -->
-                        <div class="flex justify-center pt-2">
-                            <button
-                                id="btn-publicar-conclusiones"
-                                type="submit"
-                                class="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base shadow-lg hover:shadow-emerald-600/25 transition-all cursor-pointer"
-                            >
-                                Publicar Conclusiones del Equipo
-                            </button>
-                        </div>
-                    </form>
+                    <div class="shrink-0 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5 text-xs text-amber-800 max-w-xs">
+                        <strong class="block font-bold mb-0.5">⚠ Envío Definitivo</strong>
+                        Verifica tu redacción antes de subir: una vez bloqueada la respuesta, no podrá modificarse.
+                    </div>
                 </div>
 
-                <!-- Contenedor donde se renderizan dinámicamente las 4 Tarjetas Profesionales (Cards) -->
-                <div id="seccion-evidencia-publicada" class="hidden pt-2">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">
-                            Evidencia Final de Consultoría — Conclusiones Publicadas
-                        </h3>
-                        <span id="estado-publicacion" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600">
-                            Pendiente de publicación
-                        </span>
-                    </div>
-
-                    <!-- Grid para las 4 tarjetas renderizadas por JavaScript -->
-                    <div id="contenedor-tarjetas-equipo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    </div>
+                <!-- Grid 2x2 donde JavaScript renderiza los 4 espacios individuales (Formulario activo o Tarjeta bloqueada) -->
+                <div id="grid-espacios-integrantes" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Se renderiza dinámicamente al iniciar el DOM -->
                 </div>
             </div>
         </section>
 
     </main>
+
+    <!-- ==========================================================================
+         MODAL DE CONFIRMACIÓN DE ENTREGA DEFINITIVA (BLOQUEO PERMANENTE)
+         Evita envíos accidentales antes de bloquear la respuesta del estudiante
+         ========================================================================== -->
+    <div
+        id="modal-confirmar-entrega"
+        class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-node">
+            <div class="header-card-estudiante bg-slate-900 px-5 py-4 flex items-center justify-between">
+                <span class="text-sm font-bold text-white uppercase tracking-wider">
+                    🔒 Confirmar Entrega Definitiva
+                </span>
+                <span class="text-xs font-mono text-emerald-300">Solo Lectura</span>
+            </div>
+            <div class="p-5 space-y-4">
+                <p class="text-sm text-slate-700 leading-relaxed">
+                    Estás a punto de registrar y bloquear el aporte oficial de:
+                    <strong id="nombre-confirmacion-modal" class="block text-base text-slate-900 mt-1"></strong>
+                </p>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 leading-relaxed">
+                    <strong>Importante:</strong> Después de confirmar, este espacio se convertirá en una tarjeta verificada para el profesor y <strong>ya no se podrá editar ni eliminar</strong>.
+                </div>
+                <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
+                    <button
+                        id="btn-cancelar-confirmacion"
+                        type="button"
+                        class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
+                    >
+                        Revisar antes de subir
+                    </button>
+                    <button
+                        id="btn-aceptar-confirmacion"
+                        type="button"
+                        class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm transition-colors cursor-pointer"
+                    >
+                        Sí, Subir y Bloquear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ==========================================================================
          MODAL DE ZOOM (LIGHTBOX) PARA VER LOS DIAGRAMAS DE MEMORIA EN GRANDE
@@ -1784,219 +1622,427 @@
 
 
         /* ========================================================================
-         * SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA (EQUIPO IU DIGITAL DE ANTIOQUIA)
-         * Integrantes oficiales:
+         * SECCIÓN 4: AUTOEVALUACIÓN Y CONSULTORÍA INDIVIDUAL CON BLOQUEO PERMANENTE
+         * Integrantes oficiales con nombres fijos:
          * 1. Jhon Fredy Betancur Davila
          * 2. Cristian David Gutierrez Olivar
          * 3. Jose Fernando Higuita Benitez
          * 4. Arnold Orlando Barbosa Díaz
-         * Al publicar o cargar las respuestas, limpia los campos y oculta el formulario.
+         * Cada integrante cuenta con su propio espacio y botón individual para subir
+         * sus respuestas. Una vez confirmada la subida, su módulo queda bloqueado
+         * permanentemente (solo lectura) para su revisión y calificación docente.
          * ======================================================================== */
 
-        // Referencias a elementos del DOM de la Sección 4
-        const contenedorFormularioEquipo = document.getElementById('contenedor-formulario-equipo');
-        const seccionEvidenciaPublicada = document.getElementById('seccion-evidencia-publicada');
-        const formAutoevaluacion = document.getElementById('form-autoevaluacion');
-        const contenedorTarjetasEquipo = document.getElementById('contenedor-tarjetas-equipo');
-        const estadoPublicacion = document.getElementById('estado-publicacion');
-        const btnAutocompletarEjemplo = document.getElementById('btn-autocompletar-ejemplo');
-        const btnMostrarFormulario = document.getElementById('btn-mostrar-formulario');
+        // Clave de almacenamiento persistente en el navegador
+        const CLAVE_STORAGE_AUTOEVALUACION = 'iud_evidencia1_entregas_bloqueadas_v1';
 
-        // Roles descriptivos para enriquecer el encabezado de cada tarjeta de estudiante
-        const rolesEquipo = [
-            'Arquitecto de Datos & Memoria',
-            'Líder de Desarrollo Frontend & DOM',
-            'Analista de Complejidad Algorítmica',
-            'Diseñador de Experiencia UX/UI & QA'
+        // Arreglo estático de los 4 integrantes oficiales del equipo con nombres e iniciales fijos
+        const integrantesEquipoOficial = [
+            {
+                id: 1,
+                iniciales: 'JB',
+                nombreFijo: 'Jhon Fredy Betancur Davila',
+                nombreCorto: 'Jhon Fredy',
+                rol: 'Arquitecto de Datos & Memoria'
+            },
+            {
+                id: 2,
+                iniciales: 'CG',
+                nombreFijo: 'Cristian David Gutierrez Olivar',
+                nombreCorto: 'Cristian David',
+                rol: 'Líder de Desarrollo Frontend & DOM'
+            },
+            {
+                id: 3,
+                iniciales: 'JH',
+                nombreFijo: 'Jose Fernando Higuita Benitez',
+                nombreCorto: 'Jose Fernando',
+                rol: 'Analista de Complejidad Algorítmica'
+            },
+            {
+                id: 4,
+                iniciales: 'AB',
+                nombreFijo: 'Arnold Orlando Barbosa Díaz',
+                nombreCorto: 'Arnold Orlando',
+                rol: 'Diseñador de Experiencia UX/UI & QA'
+            }
         ];
 
+        // Estado en memoria de las entregas bloqueadas indexadas por id de integrante (1..4)
+        let entregasBloqueadas = {};
+
+        // Variable temporal para recordar qué integrante solicitó confirmación en el modal
+        let pendienteConfirmacion = null;
+
+        // Referencias del DOM de la Sección 4 y su Modal de Confirmación
+        const gridEspaciosIntegrantes = document.getElementById('grid-espacios-integrantes');
+        const spanProgresoEntregas = document.getElementById('progreso-entregas-equipo');
+        const btnCopiarEnlaceEntrega = document.getElementById('btn-copiar-enlace-entrega');
+        const modalConfirmarEntrega = document.getElementById('modal-confirmar-entrega');
+        const nombreConfirmacionModal = document.getElementById('nombre-confirmacion-modal');
+        const btnCancelarConfirmacion = document.getElementById('btn-cancelar-confirmacion');
+        const btnAceptarConfirmacion = document.getElementById('btn-aceptar-confirmacion');
+
         /**
-         * Función que recibe un arreglo de 4 objetos de estudiantes, renderiza las
-         * 4 Tarjetas Profesionales (Cards) de evidencia, limpia los inputs en blanco
-         * y oculta el formulario para dejar una presentación limpia.
+         * Codifica un objeto JSON en Base64URL compatible con caracteres UTF-8 (tildes/ñ)
+         * para incrustar las respuestas bloqueadas en la URL de entrega al docente.
          */
-        function renderizarTarjetasYOcultarFormulario(datosEstudiantes) {
-            // Limpiamos el contenedor de tarjetas antes de inyectar las 4 tarjetas definitivas
-            contenedorTarjetasEquipo.innerHTML = '';
-
-            // Recorremos los 4 objetos de estudiantes y construimos cada Card profesional
-            datosEstudiantes.forEach((estudiante) => {
-                // Obtenemos las iniciales del nombre para el avatar visual de la tarjeta
-                const iniciales = estudiante.nombre
-                    .split(' ')
-                    .filter(Boolean)
-                    .slice(0, 2)
-                    .map((palabra) => palabra[0].toUpperCase())
-                    .join('');
-
-                // Creamos el elemento semántico <article> para la tarjeta del estudiante
-                const cardEstudiante = document.createElement('article');
-                cardEstudiante.className = 'animate-node bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden flex flex-col justify-between hover:shadow-lg transition-shadow';
-
-                cardEstudiante.innerHTML = `
-                    <!-- Encabezado de la Tarjeta con el Nombre del Estudiante e Institución -->
-                    <div class="header-card-estudiante bg-slate-900 bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="avatar-estudiante w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
-                                ${sanitizarTexto(iniciales)}
-                            </span>
-                            <div>
-                                <h4 class="text-base font-bold text-white leading-snug">
-                                    ${sanitizarTexto(estudiante.nombre)}
-                                </h4>
-                                <span class="text-xs text-emerald-300 font-mono block">
-                                    ${sanitizarTexto(estudiante.rol)}
-                                </span>
-                            </div>
-                        </div>
-                        <span class="px-2.5 py-1 rounded bg-white/10 text-[11px] font-mono text-emerald-200 shrink-0">
-                            IU Digital #${estudiante.numero}
-                        </span>
-                    </div>
-
-                    <!-- Cuerpo de la Tarjeta con las dos respuestas formateadas elegantemente -->
-                    <div class="p-5 space-y-4 flex-grow bg-white">
-                        <!-- Respuesta 1: Volumen Fijo (Estático) vs Variable (Dinámico) -->
-                        <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-emerald-600">
-                            <h5 class="text-xs font-bold uppercase tracking-wide text-emerald-800 mb-1.5">
-                                1. Importancia de identificar volumen fijo (estático) vs. variable (dinámico)
-                            </h5>
-                            <p class="text-sm text-slate-700 leading-relaxed">
-                                ${sanitizarTexto(estudiante.respuestaVolumenDatos)}
-                            </p>
-                        </div>
-
-                        <!-- Respuesta 2: Diversidad de Habilidades en el Equipo -->
-                        <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-slate-600">
-                            <h5 class="text-xs font-bold uppercase tracking-wide text-slate-800 mb-1.5">
-                                2. Aporte de la diversidad de habilidades del grupo a la propuesta
-                            </h5>
-                            <p class="text-sm text-slate-700 leading-relaxed">
-                                ${sanitizarTexto(estudiante.respuestaDiversidadGrupo)}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Pie de la Tarjeta de Evidencia -->
-                    <div class="px-5 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-                        <span>IU Digital de Antioquia — Evidencia de Consultoría</span>
-                        <span class="text-emerald-700 font-semibold">✔ Verificado</span>
-                    </div>
-                `;
-
-                // Agregamos la tarjeta terminada al contenedor en pantalla
-                contenedorTarjetasEquipo.appendChild(cardEstudiante);
-            });
-
-            // 1. Dejamos todos los campos del formulario en blanco (.reset())
-            formAutoevaluacion.reset();
-
-            // 2. Ocultamos el contenedor del formulario y mostramos la sección de tarjetas publicadas
-            contenedorFormularioEquipo.classList.add('hidden');
-            seccionEvidenciaPublicada.classList.remove('hidden');
-
-            // 3. Mostramos el botón "Mostrar Formulario vacío" por si desean volver al formulario limpio sin tarjetas
-            btnMostrarFormulario.classList.remove('hidden');
-
-            // 4. Actualizamos la insignia de estado de publicación
-            estadoPublicacion.textContent = '✔ 4 Conclusiones Publicadas (Formulario Oculto)';
-            estadoPublicacion.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800';
+        function codificarEstadoEnBase64Url(objeto) {
+            const jsonStr = JSON.stringify(objeto);
+            const bytes = new TextEncoder().encode(jsonStr);
+            let binario = '';
+            bytes.forEach((b) => { binario += String.fromCharCode(b); });
+            return btoa(binario).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         }
 
         /**
-         * Función que captura las entradas manuales de los 4 estudiantes en el formulario
-         * y publica las tarjetas.
+         * Decodifica una cadena Base64URL UTF-8 de vuelta al objeto JSON de entregas.
          */
-        function publicarConclusionesEquipo(evento) {
-            if (evento) evento.preventDefault();
+        function decodificarEstadoDesdeBase64Url(cadenaBase64Url) {
+            const base64 = cadenaBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+            const binario = atob(base64 + padding);
+            const bytes = Uint8Array.from(binario, (c) => c.charCodeAt(0));
+            const jsonStr = new TextDecoder().decode(bytes);
+            return JSON.parse(jsonStr);
+        }
 
-            const datosEstudiantes = [];
+        /**
+         * Carga las entregas bloqueadas previamente desde la URL (?entrega=...) y localStorage.
+         */
+        function cargarEntregasPersistidas() {
+            let estadoCargado = {};
 
-            for (let i = 1; i <= 4; i++) {
-                const inputNombre = document.getElementById(`nombre-est-${i}`);
-                const textareaResp1 = document.getElementById(`resp1-est-${i}`);
-                const textareaResp2 = document.getElementById(`resp2-est-${i}`);
-
-                const nombre = inputNombre.value.trim();
-                const respuesta1 = textareaResp1.value.trim();
-                const respuesta2 = textareaResp2.value.trim();
-
-                if (!nombre || !respuesta1 || !respuesta2) {
-                    alert(`Por favor completa todos los campos del Integrante #${i} antes de publicar (o usa el botón "Cargar Respuestas del Equipo").`);
-                    inputNombre.focus();
-                    return;
+            // 1. Leemos desde localStorage si existen entregas bloqueadas en este equipo
+            try {
+                const guardadoLocal = localStorage.getItem(CLAVE_STORAGE_AUTOEVALUACION);
+                if (guardadoLocal) {
+                    const parseado = JSON.parse(guardadoLocal);
+                    if (parseado && typeof parseado === 'object') {
+                        estadoCargado = { ...parseado };
+                    }
                 }
-
-                datosEstudiantes.push({
-                    numero: i,
-                    rol: rolesEquipo[i - 1],
-                    nombre: nombre,
-                    respuestaVolumenDatos: respuesta1,
-                    respuestaDiversidadGrupo: respuesta2
-                });
+            } catch (e) {
+                // Si el navegador restringe localStorage, continuamos con memoria y URL
             }
 
-            renderizarTarjetasYOcultarFormulario(datosEstudiantes);
+            // 2. Si el profesor o compañero abre un enlace con ?entrega=..., fusionamos esas respuestas bloqueadas
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const paramEntrega = params.get('entrega');
+                if (paramEntrega) {
+                    const desdeUrl = decodificarEstadoDesdeBase64Url(paramEntrega);
+                    if (desdeUrl && typeof desdeUrl === 'object') {
+                        estadoCargado = { ...estadoCargado, ...desdeUrl };
+                    }
+                }
+            } catch (e) {
+                // Ignoramos parámetros malformados sin interrumpir la carga
+            }
+
+            entregasBloqueadas = estadoCargado;
+            sincronizarPersistenciaYEncabezado();
         }
 
         /**
-         * Función que publica directamente las conclusiones de los 4 integrantes oficiales
-         * del equipo de la IU Digital de Antioquia, dejando los campos del formulario
-         * en blanco y ocultándolos.
+         * Guarda las entregas bloqueadas en localStorage, sincroniza el parámetro ?entrega=
+         * de la barra de direcciones y actualiza el contador del encabezado de la Sección 4.
          */
-        function cargarRespuestasDeEjemplo() {
-            const conclusionesEquipoIUDigital = [
-                {
-                    numero: 1,
-                    rol: rolesEquipo[0],
-                    nombre: 'Jhon Fredy Betancur Davila',
-                    respuestaVolumenDatos: 'Determinar la naturaleza del volumen de datos antes de codificar evita dos fallos críticos de arquitectura: el desbordamiento de memoria (cuando usamos estructuras fijas para datos impredecibles) y el desperdicio de RAM por punteros innecesarios (cuando usamos estructuras dinámicas para datos constantes como los 30 días del mes).',
-                    respuestaDiversidadGrupo: 'Nuestra combinación de pensamiento analítico para el modelado de memoria y sensibilidad visual para el diseño de interfaces nos permitió traducir conceptos abstractos como punteros y matrices en un panel intuitivo para los floricultores.'
-                },
-                {
-                    numero: 2,
-                    rol: rolesEquipo[1],
-                    nombre: 'Cristian David Gutierrez Olivar',
-                    respuestaVolumenDatos: 'Porque define directamente la complejidad algorítmica O(1) vs O(n) y el uso de la memoria Stack o Heap. En sensores climáticos de frecuencia fija, el vector estático ofrece velocidad insuperable; en contratación temporal, la lista enlazada brinda elasticidad total.',
-                    respuestaDiversidadGrupo: 'Mientras algunos integrantes estructuraron las clases de nodos y el recorrido matricial en JavaScript, otros diseñaron la experiencia de usuario con Tailwind CSS y documentaron línea por línea el código como material pedagógico.'
-                },
-                {
-                    numero: 3,
-                    rol: rolesEquipo[2],
-                    nombre: 'Jose Fernando Higuita Benitez',
-                    respuestaVolumenDatos: 'Identificar si el dominio del problema es estático o dinámico garantiza escalabilidad financiera y técnica. Una mala elección inicial obliga a refactorizar toda la capa de persistencia y procesamiento cuando el cultivo crece en temporada alta.',
-                    respuestaDiversidadGrupo: 'El debate técnico entre quienes preferían arreglos tradicionales y quienes defendían nodos enlazados enriqueció la justificación arquitectónica de cada ficha técnica, logrando una consultoría sólida y bien argumentada.'
-                },
-                {
-                    numero: 4,
-                    rol: rolesEquipo[3],
-                    nombre: 'Arnold Orlando Barbosa Díaz',
-                    respuestaVolumenDatos: 'Permite al ingeniero de software anticipar cómo se comportará la aplicación en producción bajo carga real, seleccionando matrices contiguas cuando se requiere cruce rápido de coordenadas o listas dinámicas cuando prima la flexibilidad.',
-                    respuestaDiversidadGrupo: 'La división modular del trabajo en nuestro equipo de la IU Digital de Antioquia (estructura semántica HTML5, lógica algorítmica en Vanilla JS, diseño responsive y pruebas de calidad) hizo posible entregar un producto cohesivo y libre de errores.'
-                }
-            ];
+        function sincronizarPersistenciaYEncabezado() {
+            const totalBloqueadas = Object.keys(entregasBloqueadas).length;
 
-            // Renderizamos las 4 tarjetas profesionales, limpiamos los campos en blanco y ocultamos el formulario
-            renderizarTarjetasYOcultarFormulario(conclusionesEquipoIUDigital);
+            // Guardamos en localStorage
+            try {
+                localStorage.setItem(CLAVE_STORAGE_AUTOEVALUACION, JSON.stringify(entregasBloqueadas));
+            } catch (e) {}
+
+            // Sincronizamos en la URL (?entrega=...) para que al copiar el link el profesor vea las respuestas
+            if (totalBloqueadas > 0) {
+                try {
+                    const codificado = codificarEstadoEnBase64Url(entregasBloqueadas);
+                    if (codificado.length < 6500) {
+                        const nuevaUrl = new URL(window.location.href);
+                        nuevaUrl.searchParams.set('entrega', codificado);
+                        window.history.replaceState(null, '', nuevaUrl.toString());
+                    }
+                } catch (e) {}
+                btnCopiarEnlaceEntrega.classList.remove('hidden');
+            } else {
+                btnCopiarEnlaceEntrega.classList.add('hidden');
+            }
+
+            // Actualizamos el indicador visual de entregas registradas
+            if (totalBloqueadas === 4) {
+                spanProgresoEntregas.textContent = '✅ 4 / 4 Entregas Bloqueadas (Listo para Docente)';
+                spanProgresoEntregas.className = 'text-xs font-bold px-3 py-1.5 rounded-md bg-emerald-500 text-slate-950 font-mono shadow-sm';
+            } else {
+                spanProgresoEntregas.textContent = `🔒 Entregas registradas: ${totalBloqueadas} / 4`;
+                spanProgresoEntregas.className = 'text-xs font-semibold px-3 py-1.5 rounded-md bg-slate-900 text-emerald-400 border border-slate-700 font-mono';
+            }
         }
 
-        // Evento para volver a mostrar el formulario en blanco y ocultar/limpiar las tarjetas publicadas
-        btnMostrarFormulario.addEventListener('click', () => {
-            // 1. Limpiamos todos los campos del formulario
-            formAutoevaluacion.reset();
-            // 2. Vaciamos las tarjetas generadas y ocultamos el bloque de evidencia publicada
-            contenedorTarjetasEquipo.innerHTML = '';
-            seccionEvidenciaPublicada.classList.add('hidden');
-            // 3. Mostramos nuevamente el formulario vacío y ocultamos este botón
-            contenedorFormularioEquipo.classList.remove('hidden');
-            btnMostrarFormulario.classList.add('hidden');
+        /**
+         * Construye el HTML de un espacio en modo BLOQUEADO (Tarjeta Oficial de Solo Lectura para el Profesor).
+         */
+        function crearHTMLTarjetaBloqueada(integrante, datosEntrega) {
+            return `
+                <!-- Encabezado de la Tarjeta Bloqueada con el Nombre Fijo del Estudiante -->
+                <div class="header-card-estudiante bg-slate-900 bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="avatar-estudiante w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
+                            ${sanitizarTexto(integrante.iniciales)}
+                        </span>
+                        <div>
+                            <h4 class="text-base font-bold text-white leading-snug">
+                                ${sanitizarTexto(integrante.nombreFijo)}
+                            </h4>
+                            <span class="text-xs text-emerald-300 font-mono block">
+                                ${sanitizarTexto(integrante.rol)}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-mono text-emerald-200 shrink-0 whitespace-nowrap">
+                        🔒 Entregado #${integrante.id}
+                    </span>
+                </div>
+
+                <!-- Cuerpo de Solo Lectura con las dos respuestas definitivas del integrante -->
+                <div class="p-5 space-y-4 flex-grow bg-white">
+                    <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-emerald-600">
+                        <h5 class="text-xs font-bold uppercase tracking-wide text-emerald-800 mb-1.5">
+                            1. Importancia de identificar volumen fijo (estático) vs. variable (dinámico)
+                        </h5>
+                        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">${sanitizarTexto(datosEntrega.r1)}</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-slate-600">
+                        <h5 class="text-xs font-bold uppercase tracking-wide text-slate-800 mb-1.5">
+                            2. Aporte de la diversidad de habilidades del grupo a la propuesta
+                        </h5>
+                        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">${sanitizarTexto(datosEntrega.r2)}</p>
+                    </div>
+                </div>
+
+                <!-- Pie de Tarjeta Bloqueada sin botones de edición -->
+                <div class="px-5 py-2.5 bg-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                    <span>Registro: <strong>${sanitizarTexto(datosEntrega.fecha || 'Verificado')}</strong></span>
+                    <span class="text-emerald-700 font-bold">✔ Bloqueado para Revisión Docente (No editable)</span>
+                </div>
+            `;
+        }
+
+        /**
+         * Construye el HTML de un espacio en modo PENDIENTE (Formulario individual con nombre fijo y botón propio).
+         */
+        function crearHTMLFormularioIndividual(integrante) {
+            return `
+                <!-- Encabezado del Espacio Individual con Nombre Fijo -->
+                <div class="header-card-estudiante bg-slate-900 bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="avatar-estudiante w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-extrabold flex items-center justify-center text-sm shadow shrink-0">
+                            ${sanitizarTexto(integrante.iniciales)}
+                        </span>
+                        <div>
+                            <h4 class="text-base font-bold text-white leading-snug">
+                                ${sanitizarTexto(integrante.nombreFijo)}
+                            </h4>
+                            <span class="text-xs text-emerald-300 font-mono block">
+                                ${sanitizarTexto(integrante.rol)}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded bg-white/10 text-[11px] font-mono text-amber-300 shrink-0 whitespace-nowrap">
+                        Pendiente #${integrante.id}
+                    </span>
+                </div>
+
+                <!-- Campos exclusivos para este integrante -->
+                <div class="p-5 space-y-4 flex-grow bg-slate-50 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <!-- Nombre fijo bloqueado (no editable) -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">
+                                Integrante Asignado (Nombre Fijo)
+                            </label>
+                            <input
+                                type="text"
+                                value="${sanitizarTexto(integrante.nombreFijo)}"
+                                readonly
+                                tabindex="-1"
+                                class="w-full px-3.5 py-2 text-sm font-semibold text-slate-700 bg-slate-200/80 border border-slate-300 rounded-lg cursor-default select-none outline-none"
+                            >
+                        </div>
+
+                        <!-- Pregunta 1 -->
+                        <div>
+                            <label for="resp1-est-${integrante.id}" class="block text-xs font-semibold text-slate-700 mb-1">
+                                1. ¿Por qué es importante identificar si un volumen de datos será fijo (estático) o variable (dinámico) antes de programar?
+                            </label>
+                            <textarea
+                                id="resp1-est-${integrante.id}"
+                                rows="3"
+                                placeholder="Escribe aquí tu análisis técnico sobre memoria y rendimiento..."
+                                class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                            ></textarea>
+                        </div>
+
+                        <!-- Pregunta 2 -->
+                        <div>
+                            <label for="resp2-est-${integrante.id}" class="block text-xs font-semibold text-slate-700 mb-1">
+                                2. ¿Cómo la diversidad de habilidades en nuestro grupo facilitó la propuesta?
+                            </label>
+                            <textarea
+                                id="resp2-est-${integrante.id}"
+                                rows="3"
+                                placeholder="Describe aquí el aporte colaborativo del equipo..."
+                                class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                            ></textarea>
+                        </div>
+
+                        <!-- Mensaje de validación individual en caso de campos vacíos -->
+                        <p id="error-est-${integrante.id}" class="hidden text-xs font-semibold text-rose-600"></p>
+                    </div>
+
+                    <!-- Botón individual de envío y bloqueo permanente para este integrante -->
+                    <div class="pt-2 border-t border-slate-200">
+                        <button
+                            type="button"
+                            data-integrante-id="${integrante.id}"
+                            class="btn-subir-individual w-full px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm shadow-sm transition-all cursor-pointer"
+                        >
+                            🔒 Subir y Bloquear Respuesta de ${sanitizarTexto(integrante.nombreCorto)}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renderiza únicamente el contenedor de un integrante específico sin afectar lo que
+         * otros compañeros estén escribiendo en los demás módulos abiertos.
+         */
+        function actualizarSlotIntegrante(idIntegrante) {
+            const integrante = integrantesEquipoOficial.find((m) => m.id === idIntegrante);
+            const slot = document.getElementById(`slot-integrante-${idIntegrante}`);
+            if (!integrante || !slot) return;
+
+            const entrega = entregasBloqueadas[idIntegrante];
+            if (entrega && entrega.r1 && entrega.r2) {
+                slot.innerHTML = crearHTMLTarjetaBloqueada(integrante, entrega);
+            } else {
+                slot.innerHTML = crearHTMLFormularioIndividual(integrante);
+                const btnSubir = slot.querySelector('.btn-subir-individual');
+                if (btnSubir) {
+                    btnSubir.addEventListener('click', () => solicitarConfirmacionIntegrante(idIntegrante));
+                }
+            }
+        }
+
+        /**
+         * Renderiza por primera vez los 4 espacios individuales en el grid 2x2.
+         */
+        function inicializarEspaciosAutoevaluacion() {
+            gridEspaciosIntegrantes.innerHTML = '';
+
+            integrantesEquipoOficial.forEach((integrante) => {
+                const slot = document.createElement('article');
+                slot.id = `slot-integrante-${integrante.id}`;
+                slot.className = 'animate-node bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden flex flex-col justify-between hover:shadow-lg transition-shadow';
+                gridEspaciosIntegrantes.appendChild(slot);
+                actualizarSlotIntegrante(integrante.id);
+            });
+        }
+
+        /**
+         * Valida los 2 campos de texto del integrante y abre el modal de confirmación antes de bloquear.
+         */
+        function solicitarConfirmacionIntegrante(idIntegrante) {
+            const integrante = integrantesEquipoOficial.find((m) => m.id === idIntegrante);
+            if (!integrante || entregasBloqueadas[idIntegrante]) return;
+
+            const txt1 = document.getElementById(`resp1-est-${idIntegrante}`);
+            const txt2 = document.getElementById(`resp2-est-${idIntegrante}`);
+            const msgError = document.getElementById(`error-est-${idIntegrante}`);
+
+            const respuesta1 = txt1 ? txt1.value.trim() : '';
+            const respuesta2 = txt2 ? txt2.value.trim() : '';
+
+            if (!respuesta1 || !respuesta2) {
+                if (msgError) {
+                    msgError.textContent = '⚠ Por favor responde ambas preguntas antes de subir y bloquear tu entrega.';
+                    msgError.classList.remove('hidden');
+                }
+                if (!respuesta1 && txt1) txt1.focus();
+                else if (txt2) txt2.focus();
+                return;
+            }
+
+            if (msgError) msgError.classList.add('hidden');
+
+            // Guardamos temporalmente los datos validados y mostramos el modal de confirmación definitiva
+            pendienteConfirmacion = {
+                id: idIntegrante,
+                nombre: integrante.nombreFijo,
+                r1: respuesta1,
+                r2: respuesta2
+            };
+
+            nombreConfirmacionModal.textContent = integrante.nombreFijo;
+            modalConfirmarEntrega.classList.remove('hidden');
+        }
+
+        /**
+         * Confirma definitivamente el envío del integrante, lo guarda bloqueado y reemplaza el formulario por la tarjeta final.
+         */
+        function confirmarYBloquearEntregaActual() {
+            if (!pendienteConfirmacion) return;
+
+            const ahora = new Date();
+            const fechaFormateada = ahora.toLocaleDateString('es-CO') + ' ' + ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+
+            // Registramos la respuesta como bloqueada permanentemente
+            entregasBloqueadas[pendienteConfirmacion.id] = {
+                r1: pendienteConfirmacion.r1,
+                r2: pendienteConfirmacion.r2,
+                fecha: fechaFormateada
+            };
+
+            const idConfirmado = pendienteConfirmacion.id;
+            pendienteConfirmacion = null;
+            modalConfirmarEntrega.classList.add('hidden');
+
+            // Persistimos y actualizamos únicamente la tarjeta de este integrante a modo Solo Lectura
+            sincronizarPersistenciaYEncabezado();
+            actualizarSlotIntegrante(idConfirmado);
+        }
+
+        // Eventos del Modal de Confirmación
+        btnCancelarConfirmacion.addEventListener('click', () => {
+            pendienteConfirmacion = null;
+            modalConfirmarEntrega.classList.add('hidden');
+        });
+        btnAceptarConfirmacion.addEventListener('click', confirmarYBloquearEntregaActual);
+        modalConfirmarEntrega.addEventListener('click', (e) => {
+            if (e.target === modalConfirmarEntrega) {
+                pendienteConfirmacion = null;
+                modalConfirmarEntrega.classList.add('hidden');
+            }
         });
 
-        // Escuchador del evento 'submit' del formulario para el botón "Publicar Conclusiones del Equipo"
-        formAutoevaluacion.addEventListener('submit', publicarConclusionesEquipo);
-
-        // Escuchador del botón para cargar las respuestas oficiales del equipo y ocultar los campos
-        btnAutocompletarEjemplo.addEventListener('click', cargarRespuestasDeEjemplo);
+        // Evento para copiar el enlace directo con todas las respuestas bloqueadas incrustadas para el profesor
+        btnCopiarEnlaceEntrega.addEventListener('click', async () => {
+            sincronizarPersistenciaYEncabezado();
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                const textoOriginal = btnCopiarEnlaceEntrega.textContent;
+                btnCopiarEnlaceEntrega.textContent = '✔ ¡Enlace de Entrega Copiado!';
+                setTimeout(() => {
+                    btnCopiarEnlaceEntrega.textContent = textoOriginal;
+                }, 2500);
+            } catch (e) {
+                prompt('Copia este enlace con las respuestas bloqueadas para entregar al profesor:', window.location.href);
+            }
+        });
 
 
         /* ========================================================================
@@ -2014,6 +2060,10 @@
             listaRecolectores.agregarAlFinal('Lucía Fernández (Corte Especial)');
             listaRecolectores.agregarAlFinal('Carlos Restrepo (Clasificación)');
             renderizarListaEnlazadaDOM();
+
+            // 4. Cargamos el estado de las entregas bloqueadas e inicializamos los 4 espacios individuales
+            cargarEntregasPersistidas();
+            inicializarEspaciosAutoevaluacion();
         });
     </script>
 </body>
