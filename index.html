@@ -1656,6 +1656,9 @@
         // Clave de almacenamiento persistente local en el navegador
         const CLAVE_STORAGE_AUTOEVALUACION = 'iud_evidencia1_entregas_bloqueadas_v1';
 
+        // URL oficial de Google Firebase Realtime Database creada por el equipo
+        const FIREBASE_DB_URL = 'https://evidencia-floricultores-default-rtdb.firebaseio.com/entregas';
+
         /**
          * Retorna la URL del endpoint oficial de la API de entregas (Serverless Vercel).
          * Al usar la API en el mismo dominio (/api/entregas), se evitan restricciones de CORS
@@ -1802,52 +1805,122 @@
         }
 
         /**
-         * Consulta en segundo plano la base de datos central en la nube.
+         * Envía la entrega directamente a Google Firebase Realtime Database y a la API de Vercel como respaldo.
+         */
+        async function subirEntregaAFirebase(idIntegrante, datosEntrega) {
+            let guardadoExitoso = false;
+
+            // Intento 1: Directo a Google Firebase Realtime Database (rápido y con CORS nativo)
+            try {
+                const targetFb = `${FIREBASE_DB_URL}/${idIntegrante}.json`;
+                const rFb = await fetch(targetFb, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEntrega)
+                });
+                if (rFb.ok) guardadoExitoso = true;
+            } catch (e) {
+                console.warn('Advertencia conexión directa Firebase:', e);
+            }
+
+            // Intento 2: Mediante API Serverless Vercel (/api/entregas)
+            try {
+                const rApi = await fetch(obtenerEndpointApi(), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: idIntegrante, ...datosEntrega })
+                });
+                if (rApi.ok) guardadoExitoso = true;
+            } catch (e) {
+                console.warn('Advertencia API Vercel:', e);
+            }
+
+            return guardadoExitoso;
+        }
+
+        /**
+         * Consulta en segundo plano la base de datos central en la nube (Google Firebase y API Vercel).
          * Si detecta nuevas entregas bloqueadas subidas por cualquier compañero,
          * las fusiona inmediatamente en pantalla convirtiéndolas en tarjetas de solo lectura.
          */
         async function sincronizarConNube(manual = false) {
             if (manual) actualizarBadgeNube('cargando', '⏳ Sincronizando entregas...');
 
+            let datosEntregas = null;
+
+            // 1. Consulta directa a Google Firebase Realtime Database
             try {
-                const respuesta = await fetch(obtenerEndpointApi(), {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (respuesta.ok) {
-                    const datos = await respuesta.json();
-                    if (datos && datos.entregas && typeof datos.entregas === 'object') {
-                        let huboCambios = false;
-
-                        for (const [idStr, datosEntrega] of Object.entries(datos.entregas)) {
-                            const idNum = Number(idStr);
-                            if (datosEntrega && datosEntrega.r1 && datosEntrega.r2) {
-                                if (!entregasBloqueadas[idNum] || !entregasBloqueadas[idNum].r1) {
-                                    entregasBloqueadas[idNum] = datosEntrega;
-                                    huboCambios = true;
-                                }
-                            }
+                const resFb = await fetch(`${FIREBASE_DB_URL}.json`, { cache: 'no-store' });
+                if (resFb.ok) {
+                    const rawFb = await resFb.json();
+                    if (Array.isArray(rawFb)) {
+                        datosEntregas = {};
+                        rawFb.forEach((item, idx) => {
+                            if (item && item.r1 && item.r2) datosEntregas[String(idx)] = item;
+                        });
+                    } else if (rawFb && typeof rawFb === 'object') {
+                        datosEntregas = {};
+                        for (const [k, v] of Object.entries(rawFb)) {
+                            if (v && v.r1 && v.r2) datosEntregas[String(k)] = v;
                         }
-
-                        if (huboCambios) {
-                            sincronizarPersistenciaYEncabezado();
-                            integrantesEquipoOficial.forEach((m) => actualizarSlotIntegrante(m.id));
-                        }
-
-                        actualizarBadgeNube('conectado', '☁ Nube Sincronizada');
-
-                        if (manual) {
-                            if (huboCambios) {
-                                alert('✔ ¡Entregas actualizadas con éxito desde la nube!');
-                            } else {
-                                alert('✔ Todo el equipo está al día. No hay nuevas entregas registradas por el momento.');
-                            }
-                        }
-                        return;
                     }
                 }
-            } catch (err) {
-                console.warn('Advertencia al consultar base de datos en la nube:', err);
+            } catch (errFb) {
+                console.warn('Aviso Firebase directo, intentando API Vercel:', errFb);
+            }
+
+            // 2. Consulta fallback a API Serverless Vercel
+            if (!datosEntregas) {
+                try {
+                    const resApi = await fetch(obtenerEndpointApi(), {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (resApi.ok) {
+                        const jsonApi = await resApi.json();
+                        if (jsonApi && jsonApi.entregas) datosEntregas = jsonApi.entregas;
+                    }
+                } catch (errApi) {
+                    console.warn('Aviso API Vercel:', errApi);
+                }
+            }
+
+            // 3. Procesamos los datos consolidados
+            if (datosEntregas && typeof datosEntregas === 'object') {
+                let huboCambios = false;
+
+                for (const [idStr, datosEntrega] of Object.entries(datosEntregas)) {
+                    const idNum = Number(idStr);
+                    if (datosEntrega && datosEntrega.r1 && datosEntrega.r2) {
+                        if (!entregasBloqueadas[idNum] || !entregasBloqueadas[idNum].r1) {
+                            entregasBloqueadas[idNum] = datosEntrega;
+                            huboCambios = true;
+                        }
+                    }
+                }
+
+                // Sincronización bidireccional automática: si este dispositivo tiene una entrega local que falta en Firebase, la sube
+                for (const [idLocal, entregaLocal] of Object.entries(entregasBloqueadas)) {
+                    if (entregaLocal && entregaLocal.r1 && entregaLocal.r2 && (!datosEntregas[idLocal] || !datosEntregas[idLocal].r1)) {
+                        subirEntregaAFirebase(Number(idLocal), entregaLocal).catch(() => {});
+                    }
+                }
+
+                if (huboCambios) {
+                    sincronizarPersistenciaYEncabezado();
+                    integrantesEquipoOficial.forEach((m) => actualizarSlotIntegrante(m.id));
+                }
+
+                actualizarBadgeNube('conectado', '☁ Firebase Sincronizado');
+
+                if (manual) {
+                    if (huboCambios) {
+                        alert('✔ ¡Entregas actualizadas con éxito desde Google Firebase!');
+                    } else {
+                        alert('✔ Todo el equipo está al día con la nube. No hay nuevas entregas registradas por el momento.');
+                    }
+                }
+                return;
             }
 
             actualizarBadgeNube('error', '⚠ Nube en espera (Caché local activa)');
@@ -2163,35 +2236,17 @@
             btnAceptarConfirmacion.disabled = false;
             btnAceptarConfirmacion.textContent = 'Sí, Subir y Bloquear Definitivamente';
 
-            // Sincronizamos con el servidor central mediante POST /api/entregas (sin restricciones de CORS)
-            actualizarBadgeNube('cargando', '⏳ Guardando en la nube...');
-            try {
-                const respuestaPost = await fetch(obtenerEndpointApi(), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(nuevaEntrega)
-                });
-
-                if (respuestaPost.ok) {
-                    const datosPost = await respuestaPost.json();
-                    if (datosPost && datosPost.entregas) {
-                        for (const [k, v] of Object.entries(datosPost.entregas)) {
-                            if (v && v.r1 && v.r2) {
-                                entregasBloqueadas[Number(k)] = v;
-                            }
-                        }
-                        sincronizarPersistenciaYEncabezado();
-                    }
-                    actualizarBadgeNube('conectado', '☁ Guardado en la nube');
+            // Sincronizamos con Google Firebase en la nube y API Vercel
+            actualizarBadgeNube('cargando', '⏳ Guardando en Firebase...');
+            subirEntregaAFirebase(idConfirmado, nuevaEntrega).then((exito) => {
+                if (exito) {
+                    actualizarBadgeNube('conectado', '☁ Guardado en Firebase');
                 } else {
-                    actualizarBadgeNube('error', '⚠ Guardado local (Nube offline)');
+                    actualizarBadgeNube('error', '⚠ Guardado local (Nube en espera)');
                 }
-            } catch (err) {
-                console.warn('Error al guardar en la nube:', err);
+            }).catch(() => {
                 actualizarBadgeNube('error', '⚠ Guardado local');
-            }
+            });
         }
 
         // Eventos del Modal de Confirmación
