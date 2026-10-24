@@ -782,6 +782,16 @@
                     <h2 class="text-lg sm:text-xl font-bold">Autoevaluación y Consultoría (Equipo IU Digital de Antioquia)</h2>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
+                    <!-- Indicador de conexión con la base de datos en la nube -->
+                    <span
+                        id="estado-sincronizacion-nube"
+                        class="text-xs font-mono px-2.5 py-1.5 rounded-md bg-slate-900 text-sky-300 border border-slate-700 flex items-center gap-1.5"
+                        title="Base de datos central en la nube: las entregas de cada compañero se guardan y sincronizan en vivo"
+                    >
+                        <span id="punto-estado-nube" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span id="texto-estado-nube">☁ Nube Conectada</span>
+                    </span>
+
                     <!-- Indicador de progreso de entregas bloqueadas (0/4 a 4/4) -->
                     <span
                         id="progreso-entregas-equipo"
@@ -789,6 +799,16 @@
                     >
                         🔒 Entregas registradas: 0 / 4
                     </span>
+
+                    <!-- Botón para sincronizar manualmente entregas de los compañeros en la nube -->
+                    <button
+                        id="btn-refrescar-nube"
+                        type="button"
+                        class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-2.5 py-1.5 rounded-md border border-slate-600 transition-colors cursor-pointer flex items-center gap-1"
+                        title="Consultar si algún compañero ha subido nuevas respuestas a la nube"
+                    >
+                        🔄 Sincronizar
+                    </button>
 
                     <!-- Botón para copiar el enlace directo con las respuestas bloqueadas para entregar al profesor -->
                     <button
@@ -1633,8 +1653,11 @@
          * permanentemente (solo lectura) para su revisión y calificación docente.
          * ======================================================================== */
 
-        // Clave de almacenamiento persistente en el navegador
+        // Clave de almacenamiento persistente local en el navegador
         const CLAVE_STORAGE_AUTOEVALUACION = 'iud_evidencia1_entregas_bloqueadas_v1';
+
+        // Endpoint oficial de persistencia centralizada en la nube (compartida entre los 4 compañeros y el profesor)
+        const ENDPOINT_NUBE_ENTREGAS = 'https://extendsclass.com/api/json-storage/bin/adfaadf';
 
         // Arreglo estático de los 4 integrantes oficiales del equipo con nombres e iniciales fijos
         const integrantesEquipoOficial = [
@@ -1682,6 +1705,31 @@
         const nombreConfirmacionModal = document.getElementById('nombre-confirmacion-modal');
         const btnCancelarConfirmacion = document.getElementById('btn-cancelar-confirmacion');
         const btnAceptarConfirmacion = document.getElementById('btn-aceptar-confirmacion');
+        const estadoSincronizacionNube = document.getElementById('estado-sincronizacion-nube');
+        const puntoEstadoNube = document.getElementById('punto-estado-nube');
+        const textoEstadoNube = document.getElementById('texto-estado-nube');
+        const btnRefrescarNube = document.getElementById('btn-refrescar-nube');
+
+        /**
+         * Actualiza el badge visual de sincronización en la nube (verde, amarillo o gris).
+         */
+        function actualizarBadgeNube(estado, mensajePersonalizado) {
+            if (!puntoEstadoNube || !textoEstadoNube) return;
+
+            if (estado === 'cargando') {
+                puntoEstadoNube.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+                textoEstadoNube.textContent = mensajePersonalizado || '⏳ Sincronizando...';
+                if (estadoSincronizacionNube) estadoSincronizacionNube.className = 'text-xs font-mono px-2.5 py-1.5 rounded-md bg-slate-900 text-amber-300 border border-slate-700 flex items-center gap-1.5';
+            } else if (estado === 'error') {
+                puntoEstadoNube.className = 'w-2 h-2 rounded-full bg-rose-400';
+                textoEstadoNube.textContent = mensajePersonalizado || '⚠ Nube en espera (Caché local activa)';
+                if (estadoSincronizacionNube) estadoSincronizacionNube.className = 'text-xs font-mono px-2.5 py-1.5 rounded-md bg-slate-900 text-rose-300 border border-slate-700 flex items-center gap-1.5';
+            } else {
+                puntoEstadoNube.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                textoEstadoNube.textContent = mensajePersonalizado || '☁ Nube Conectada';
+                if (estadoSincronizacionNube) estadoSincronizacionNube.className = 'text-xs font-mono px-2.5 py-1.5 rounded-md bg-slate-900 text-sky-300 border border-slate-700 flex items-center gap-1.5';
+            }
+        }
 
         /**
          * Codifica un objeto JSON en Base64URL compatible con caracteres UTF-8 (tildes/ñ)
@@ -1742,6 +1790,55 @@
 
             entregasBloqueadas = estadoCargado;
             sincronizarPersistenciaYEncabezado();
+        }
+
+        /**
+         * Consulta en segundo plano la base de datos central en la nube.
+         * Si detecta nuevas entregas bloqueadas subidas por cualquier compañero,
+         * las fusiona inmediatamente en pantalla convirtiéndolas en tarjetas de solo lectura.
+         */
+        async function sincronizarConNube(manual = false) {
+            if (manual) actualizarBadgeNube('cargando', '⏳ Sincronizando entregas...');
+
+            try {
+                const respuesta = await fetch(ENDPOINT_NUBE_ENTREGAS);
+                if (respuesta.ok) {
+                    const datos = await respuesta.json();
+                    if (datos && datos.entregas && typeof datos.entregas === 'object') {
+                        let huboCambios = false;
+
+                        for (const [idStr, datosEntrega] of Object.entries(datos.entregas)) {
+                            const idNum = Number(idStr);
+                            if (datosEntrega && datosEntrega.r1 && datosEntrega.r2) {
+                                if (!entregasBloqueadas[idNum] || !entregasBloqueadas[idNum].r1) {
+                                    entregasBloqueadas[idNum] = datosEntrega;
+                                    huboCambios = true;
+                                }
+                            }
+                        }
+
+                        if (huboCambios) {
+                            sincronizarPersistenciaYEncabezado();
+                            integrantesEquipoOficial.forEach((m) => actualizarSlotIntegrante(m.id));
+                        }
+
+                        actualizarBadgeNube('conectado', '☁ Nube Sincronizada');
+
+                        if (manual) {
+                            if (huboCambios) {
+                                alert('✔ ¡Entregas actualizadas con éxito desde la nube!');
+                            } else {
+                                alert('✔ Todo el equipo está al día. No hay nuevas entregas registradas por el momento.');
+                            }
+                        }
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('Advertencia al consultar base de datos en la nube:', err);
+            }
+
+            actualizarBadgeNube('error', '⚠ Nube en espera (Caché local activa)');
         }
 
         /**
@@ -1832,9 +1929,17 @@
         }
 
         /**
-         * Construye el HTML de un espacio en modo PENDIENTE (Formulario individual con nombre fijo y botón propio).
+         * Construye el HTML de un espacio en modo PENDIENTE (Formulario individual con nombre fijo,
+         * recuperación automática de borrador y botón propio para subir y bloquear).
          */
         function crearHTMLFormularioIndividual(integrante) {
+            let borrador1 = '';
+            let borrador2 = '';
+            try {
+                borrador1 = localStorage.getItem(`iud_draft_r1_${integrante.id}`) || '';
+                borrador2 = localStorage.getItem(`iud_draft_r2_${integrante.id}`) || '';
+            } catch (e) {}
+
             return `
                 <!-- Encabezado del Espacio Individual con Nombre Fijo -->
                 <div class="header-card-estudiante bg-slate-900 bg-gradient-to-r from-slate-900 to-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3">
@@ -1883,7 +1988,7 @@
                                 rows="3"
                                 placeholder="Escribe aquí tu análisis técnico sobre memoria y rendimiento..."
                                 class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                            ></textarea>
+                            >${sanitizarTexto(borrador1)}</textarea>
                         </div>
 
                         <!-- Pregunta 2 -->
@@ -1896,7 +2001,7 @@
                                 rows="3"
                                 placeholder="Describe aquí el aporte colaborativo del equipo..."
                                 class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                            ></textarea>
+                            >${sanitizarTexto(borrador2)}</textarea>
                         </div>
 
                         <!-- Mensaje de validación individual en caso de campos vacíos -->
@@ -1931,6 +2036,21 @@
                 slot.innerHTML = crearHTMLTarjetaBloqueada(integrante, entrega);
             } else {
                 slot.innerHTML = crearHTMLFormularioIndividual(integrante);
+
+                // Escuchadores para auto-guardar borrador mientras escribe el usuario
+                const txt1 = slot.querySelector(`#resp1-est-${idIntegrante}`);
+                const txt2 = slot.querySelector(`#resp2-est-${idIntegrante}`);
+                if (txt1) {
+                    txt1.addEventListener('input', () => {
+                        try { localStorage.setItem(`iud_draft_r1_${idIntegrante}`, txt1.value); } catch (e) {}
+                    });
+                }
+                if (txt2) {
+                    txt2.addEventListener('input', () => {
+                        try { localStorage.setItem(`iud_draft_r2_${idIntegrante}`, txt2.value); } catch (e) {}
+                    });
+                }
+
                 const btnSubir = slot.querySelector('.btn-subir-individual');
                 if (btnSubir) {
                     btnSubir.addEventListener('click', () => solicitarConfirmacionIntegrante(idIntegrante));
@@ -1992,28 +2112,82 @@
         }
 
         /**
-         * Confirma definitivamente el envío del integrante, lo guarda bloqueado y reemplaza el formulario por la tarjeta final.
+         * Confirma definitivamente el envío del integrante, lo guarda en la nube y en almacenamiento local,
+         * y reemplaza irreversiblemente el formulario por la tarjeta final de solo lectura.
          */
-        function confirmarYBloquearEntregaActual() {
+        async function confirmarYBloquearEntregaActual() {
             if (!pendienteConfirmacion) return;
+
+            // Deshabilitamos el botón del modal para prevenir dobles clics
+            btnAceptarConfirmacion.disabled = true;
+            btnAceptarConfirmacion.textContent = '⏳ Guardando y bloqueando...';
 
             const ahora = new Date();
             const fechaFormateada = ahora.toLocaleDateString('es-CO') + ' ' + ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
-            // Registramos la respuesta como bloqueada permanentemente
-            entregasBloqueadas[pendienteConfirmacion.id] = {
+            const idConfirmado = pendienteConfirmacion.id;
+            const nuevaEntrega = {
                 r1: pendienteConfirmacion.r1,
                 r2: pendienteConfirmacion.r2,
                 fecha: fechaFormateada
             };
 
-            const idConfirmado = pendienteConfirmacion.id;
-            pendienteConfirmacion = null;
-            modalConfirmarEntrega.classList.add('hidden');
+            // Registramos la respuesta como bloqueada permanentemente en memoria y local
+            entregasBloqueadas[idConfirmado] = nuevaEntrega;
 
-            // Persistimos y actualizamos únicamente la tarjeta de este integrante a modo Solo Lectura
+            // Limpiamos borradores temporales de este integrante
+            try {
+                localStorage.removeItem(`iud_draft_r1_${idConfirmado}`);
+                localStorage.removeItem(`iud_draft_r2_${idConfirmado}`);
+            } catch (e) {}
+
+            // Persistimos localmente y actualizamos de inmediato la tarjeta a modo Solo Lectura
             sincronizarPersistenciaYEncabezado();
             actualizarSlotIntegrante(idConfirmado);
+
+            // Cerramos el modal
+            pendienteConfirmacion = null;
+            modalConfirmarEntrega.classList.add('hidden');
+            btnAceptarConfirmacion.disabled = false;
+            btnAceptarConfirmacion.textContent = 'Sí, Subir y Bloquear Definitivamente';
+
+            // Sincronizamos con la nube central (fusionando con lo que otros compañeros hayan subido)
+            actualizarBadgeNube('cargando', '⏳ Guardando en la nube...');
+            try {
+                let estadoCloud = {};
+                try {
+                    const rGet = await fetch(ENDPOINT_NUBE_ENTREGAS);
+                    if (rGet.ok) {
+                        const dGet = await rGet.json();
+                        if (dGet && dGet.entregas && typeof dGet.entregas === 'object') {
+                            estadoCloud = dGet.entregas;
+                        }
+                    }
+                } catch (e) {}
+
+                const entregasFusionadas = { ...estadoCloud, ...entregasBloqueadas };
+
+                const rPut = await fetch(ENDPOINT_NUBE_ENTREGAS, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        proyecto: 'IU Digital de Antioquia - Evidencia 1 Estructura de Datos',
+                        asignatura: 'Estructura de Datos',
+                        equipo: 'Asociación de Floricultores',
+                        ultimaActualizacion: new Date().toISOString(),
+                        entregas: entregasFusionadas
+                    })
+                });
+
+                if (rPut.ok) {
+                    actualizarBadgeNube('conectado', '☁ Guardado en la nube');
+                } else {
+                    actualizarBadgeNube('error', '⚠ Guardado local (Nube offline)');
+                }
+            } catch (err) {
+                console.warn('Error al guardar en la nube:', err);
+                actualizarBadgeNube('error', '⚠ Guardado local');
+            }
         }
 
         // Eventos del Modal de Confirmación
@@ -2028,6 +2202,11 @@
                 modalConfirmarEntrega.classList.add('hidden');
             }
         });
+
+        // Evento para refrescar entregas en la nube manualmente al hacer clic en 'Sincronizar'
+        if (btnRefrescarNube) {
+            btnRefrescarNube.addEventListener('click', () => sincronizarConNube(true));
+        }
 
         // Evento para copiar el enlace directo con todas las respuestas bloqueadas incrustadas para el profesor
         btnCopiarEnlaceEntrega.addEventListener('click', async () => {
@@ -2061,9 +2240,15 @@
             listaRecolectores.agregarAlFinal('Carlos Restrepo (Clasificación)');
             renderizarListaEnlazadaDOM();
 
-            // 4. Cargamos el estado de las entregas bloqueadas e inicializamos los 4 espacios individuales
+            // 4. Cargamos el estado inicial local/URL e inicializamos los 4 espacios individuales
             cargarEntregasPersistidas();
             inicializarEspaciosAutoevaluacion();
+
+            // 5. Conectamos con la base de datos en la nube para sincronizar entregas en tiempo real
+            sincronizarConNube(false);
+
+            // 6. Consultamos la nube periódicamente cada 20 segundos para reflejar entregas en vivo
+            setInterval(() => sincronizarConNube(false), 20000);
         });
     </script>
 </body>
