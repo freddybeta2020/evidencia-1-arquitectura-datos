@@ -22,21 +22,19 @@ module.exports = async function handler(req, res) {
   // GET: Consultar todas las entregas bloqueadas del equipo
   if (req.method === 'GET') {
     try {
-      const resp = await fetch(STORAGE_ENDPOINT);
-      if (!resp.ok) {
-        return res.status(200).json({
-          entregas: {},
-          errorStatus: resp.status,
-          errorText: await resp.text().catch(() => '')
-        });
-      }
-      const data = await resp.json();
-      return res.status(200).json(data || { entregas: {} });
+      const resp = await fetch(STORAGE_ENDPOINT, { cache: 'no-store' });
+      const rawText = await resp.text();
+      let parsed = {};
+      try { parsed = JSON.parse(rawText); } catch(e) {}
+      return res.status(200).json({
+        rawLength: rawText.length,
+        entregasKeys: Object.keys(parsed.entregas || {}),
+        data: parsed
+      });
     } catch (err) {
       return res.status(200).json({
         entregas: {},
-        errorMessage: err.message,
-        errorStack: err.stack
+        errorMessage: err.message
       });
     }
   }
