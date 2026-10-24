@@ -1656,8 +1656,17 @@
         // Clave de almacenamiento persistente local en el navegador
         const CLAVE_STORAGE_AUTOEVALUACION = 'iud_evidencia1_entregas_bloqueadas_v1';
 
-        // Endpoint oficial de persistencia centralizada en la nube (compartida entre los 4 compañeros y el profesor)
-        const ENDPOINT_NUBE_ENTREGAS = 'https://extendsclass.com/api/json-storage/bin/adfaadf';
+        /**
+         * Retorna la URL del endpoint oficial de la API de entregas (Serverless Vercel).
+         * Al usar la API en el mismo dominio (/api/entregas), se evitan restricciones de CORS
+         * tanto en navegadores de escritorio como en celulares Android e iOS.
+         */
+        function obtenerEndpointApi() {
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                return window.location.origin + '/api/entregas';
+            }
+            return 'https://evidencia-1-arquitectura-datos.vercel.app/api/entregas';
+        }
 
         // Arreglo estático de los 4 integrantes oficiales del equipo con nombres e iniciales fijos
         const integrantesEquipoOficial = [
@@ -1801,7 +1810,10 @@
             if (manual) actualizarBadgeNube('cargando', '⏳ Sincronizando entregas...');
 
             try {
-                const respuesta = await fetch(ENDPOINT_NUBE_ENTREGAS);
+                const respuesta = await fetch(obtenerEndpointApi(), {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
                 if (respuesta.ok) {
                     const datos = await respuesta.json();
                     if (datos && datos.entregas && typeof datos.entregas === 'object') {
@@ -2151,35 +2163,27 @@
             btnAceptarConfirmacion.disabled = false;
             btnAceptarConfirmacion.textContent = 'Sí, Subir y Bloquear Definitivamente';
 
-            // Sincronizamos con la nube central (fusionando con lo que otros compañeros hayan subido)
+            // Sincronizamos con el servidor central mediante POST /api/entregas (sin restricciones de CORS)
             actualizarBadgeNube('cargando', '⏳ Guardando en la nube...');
             try {
-                let estadoCloud = {};
-                try {
-                    const rGet = await fetch(ENDPOINT_NUBE_ENTREGAS);
-                    if (rGet.ok) {
-                        const dGet = await rGet.json();
-                        if (dGet && dGet.entregas && typeof dGet.entregas === 'object') {
-                            estadoCloud = dGet.entregas;
-                        }
-                    }
-                } catch (e) {}
-
-                const entregasFusionadas = { ...estadoCloud, ...entregasBloqueadas };
-
-                const rPut = await fetch(ENDPOINT_NUBE_ENTREGAS, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        proyecto: 'IU Digital de Antioquia - Evidencia 1 Estructura de Datos',
-                        asignatura: 'Estructura de Datos',
-                        equipo: 'Asociación de Floricultores',
-                        ultimaActualizacion: new Date().toISOString(),
-                        entregas: entregasFusionadas
-                    })
+                const respuestaPost = await fetch(obtenerEndpointApi(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(nuevaEntrega)
                 });
 
-                if (rPut.ok) {
+                if (respuestaPost.ok) {
+                    const datosPost = await respuestaPost.json();
+                    if (datosPost && datosPost.entregas) {
+                        for (const [k, v] of Object.entries(datosPost.entregas)) {
+                            if (v && v.r1 && v.r2) {
+                                entregasBloqueadas[Number(k)] = v;
+                            }
+                        }
+                        sincronizarPersistenciaYEncabezado();
+                    }
                     actualizarBadgeNube('conectado', '☁ Guardado en la nube');
                 } else {
                     actualizarBadgeNube('error', '⚠ Guardado local (Nube offline)');
